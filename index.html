@@ -40,295 +40,343 @@
 </head>
 <body class="bg-slate-50 text-slate-800 h-full flex flex-col">
 
-    <!-- App Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <!-- Logo del Ministerio -->
-                <img src="logo.png" alt="Logo Ministerio de Alfabetización" class="w-12 h-12 object-contain rounded-full shadow-sm">
-                
+    <!-- SECCIÓN DE LOGIN (Se muestra si NO hay sesión) -->
+    <div id="login-container" class="min-h-screen flex items-center justify-center bg-slate-100 p-4 w-full">
+        <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full max-w-md">
+            <div class="text-center mb-6">
+                <img src="logo.png" alt="Logo Ministerio" class="w-20 h-20 mx-auto mb-3 object-contain rounded-full shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900">Ministerio de Alfabetización</h2>
+                <p class="text-xs text-slate-500">Ingresa tus credenciales para acceder</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <h1 class="text-lg font-bold text-slate-900 leading-tight">Ministerio de Alfabetización</h1>
-                    <p class="text-xs text-slate-500">Gestión Integral de Adultos</p>
-                </div>
-            </div>
-
-            <!-- Estado de la Base de Datos -->
-            <div class="flex items-center space-x-3">
-                <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="db-status-text">Supabase Conectado</span>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="login-email" required placeholder="correo@ejemplo.com" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
                 </div>
 
-                <div class="h-9 w-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm border border-brand-200">
-                    AD
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
                 </div>
-            </div>
+
+                <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 p-2.5 rounded-xl font-medium"></div>
+
+                <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Iniciar Sesión</span>
+                </button>
+            </form>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container with Tabs -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
-        <!-- Navigation Bar -->
-        <div class="flex space-x-1 sm:space-x-2 bg-slate-200/70 p-1.5 rounded-2xl mb-6 overflow-x-auto">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 bg-white text-brand-700 shadow-sm">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Resumen</span>
-            </button>
-            <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                <i class="fa-solid fa-users"></i>
-                <span>Alumnos</span>
-            </button>
-            <button onclick="switchTab('teachers')" id="nav-teachers" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                <i class="fa-solid fa-chalkboard-user"></i>
-                <span>Maestros</span>
-            </button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span>Asistencia</span>
-            </button>
-            <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                <i class="fa-solid fa-clipboard-list"></i>
-                <span>Calificaciones</span>
-            </button>
-            <button onclick="switchTab('documents')" id="nav-documents" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                <i class="fa-solid fa-folder-open"></i>
-                <span>Documentos</span>
-            </button>
-        </div>
+    <!-- ESTRUCTURA PRINCIPAL DE LA APP (Se oculta hasta verificar login) -->
+    <div id="app-container" class="hidden h-full flex flex-col">
+        <!-- App Header -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <!-- Logo del Ministerio -->
+                    <img src="logo.png" alt="Logo Ministerio de Alfabetización" class="w-12 h-12 object-contain rounded-full shadow-sm">
+                    
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 leading-tight">Ministerio de Alfabetización</h1>
+                        <p class="text-xs text-slate-500">Gestión Integral de Adultos</p>
+                    </div>
+                </div>
 
-        <!-- TAB 1: DASHBOARD -->
-        <div id="tab-dashboard" class="tab-content flex-1 flex flex-col space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Alumnos</p>
-                        <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-students">0</h3>
+                <!-- Estado de la Base de Datos y Perfil -->
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="db-status-text">Supabase Conectado</span>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-graduate"></i>
+
+                    <div id="user-email-badge" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 hidden sm:block">
+                        <!-- Correo de usuario -->
+                    </div>
+
+                    <!-- Botón Cerrar Sesión -->
+                    <button onclick="handleLogout()" title="Cerrar Sesión" class="h-9 w-9 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm border border-red-200 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container with Tabs -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+            <!-- Navigation Bar -->
+            <div class="flex space-x-1 sm:space-x-2 bg-slate-200/70 p-1.5 rounded-2xl mb-6 overflow-x-auto">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 bg-white text-brand-700 shadow-sm">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Resumen</span>
+                </button>
+                <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Alumnos</span>
+                </button>
+                <button onclick="switchTab('teachers')" id="nav-teachers" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span>Maestros</span>
+                </button>
+                <button onclick="switchTab('attendance')" id="nav-attendance" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Asistencia</span>
+                </button>
+                <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span>Calificaciones</span>
+                </button>
+                <button onclick="switchTab('documents')" id="nav-documents" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Documentos</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content flex-1 flex flex-col space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Alumnos</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-students">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Asistencias Tomadas</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-avg-attendance">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos Nivel 0</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-nivel0">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Con Documentos</p>
+                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-docs">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Asistencias Tomadas</p>
-                        <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-avg-attendance">0</h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Activity -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
+                        <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center">
+                            <i class="fa-solid fa-bolt text-brand-600 mr-2"></i> Alumnos Registrados Recientemente
+                        </h3>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <th class="pb-3 font-medium">Alumno</th>
+                                        <th class="pb-3 font-medium">Maestro Responsable</th>
+                                        <th class="pb-3 font-medium">Nivel</th>
+                                        <th class="pb-3 font-medium text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-students-list" class="divide-y divide-slate-100">
+                                    <!-- Dinámico desde Supabase -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos Nivel 0</p>
-                        <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-nivel0">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Con Documentos</p>
-                        <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-docs">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-file-arrow-up"></i>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-gradient-to-br from-brand-600 to-emerald-700 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
+                        <div>
+                            <div class="bg-white/15 w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white">
+                                <i class="fa-solid fa-cloud"></i>
+                            </div>
+                            <h3 class="text-lg font-bold mb-2">Base de Datos Supabase</h3>
+                            <p class="text-xs text-brand-100 leading-relaxed mb-4">
+                                Los datos y expedientes adjuntos se almacenan de forma segura en la nube de Supabase.
+                            </p>
+                        </div>
+                        <button onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Registrar Nuevo Alumno</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Recent Activity -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
-                    <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center">
-                        <i class="fa-solid fa-bolt text-brand-600 mr-2"></i> Alumnos Registrados Recientemente
-                    </h3>
+            <!-- TAB 2: STUDENTS -->
+            <div id="tab-students" class="tab-content hidden flex-1 flex flex-col space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="student-search" oninput="renderStudentsTable()" placeholder="Buscar por nombre, documento o maestro..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                    </div>
+                    <button onclick="openAddStudentModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Nuevo Alumno</span>
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
                     <div class="overflow-x-auto flex-1">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                    <th class="pb-3 font-medium">Alumno</th>
-                                    <th class="pb-3 font-medium">Maestro Responsable</th>
-                                    <th class="pb-3 font-medium">Nivel</th>
-                                    <th class="pb-3 font-medium text-right">Acción</th>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Alumno</th>
+                                    <th class="py-3 px-4">Contacto / Cédula</th>
+                                    <th class="py-3 px-4">Maestro Responsable</th>
+                                    <th class="py-3 px-4">Nivel Alfabetización</th>
+                                    <th class="py-3 px-4 text-center">Adjuntos</th>
+                                    <th class="py-3 px-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="dashboard-students-list" class="divide-y divide-slate-100">
+                            <tbody id="students-table-body" class="divide-y divide-slate-100">
                                 <!-- Dinámico desde Supabase -->
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Quick Actions -->
-                <div class="bg-gradient-to-br from-brand-600 to-emerald-700 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="bg-white/15 w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white">
-                            <i class="fa-solid fa-cloud"></i>
-                        </div>
-                        <h3 class="text-lg font-bold mb-2">Base de Datos Supabase</h3>
-                        <p class="text-xs text-brand-100 leading-relaxed mb-4">
-                            Los datos y expedientes adjuntos se almacenan de forma segura en la nube de Supabase.
-                        </p>
+            <!-- TAB MAESTROS -->
+            <div id="tab-teachers" class="tab-content hidden flex-1 flex flex-col space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="relative w-full sm:w-80">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="teacher-search" oninput="renderTeachersTable()" placeholder="Buscar por nombre o DUI..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
                     </div>
-                    <button onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
+                    <button onclick="openAddTeacherModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-user-plus"></i>
-                        <span>Registrar Nuevo Alumno</span>
+                        <span>Nuevo Maestro</span>
                     </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- TAB 2: STUDENTS -->
-        <div id="tab-students" class="tab-content hidden flex-1 flex flex-col space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="relative w-full sm:w-80">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="student-search" oninput="renderStudentsTable()" placeholder="Buscar por nombre, documento o maestro..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
-                </div>
-                <button onclick="openAddStudentModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>Nuevo Alumno</span>
-                </button>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3 px-4">Alumno</th>
-                                <th class="py-3 px-4">Contacto / Cédula</th>
-                                <th class="py-3 px-4">Maestro Responsable</th>
-                                <th class="py-3 px-4">Nivel Alfabetización</th>
-                                <th class="py-3 px-4 text-center">Adjuntos</th>
-                                <th class="py-3 px-4 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="students-table-body" class="divide-y divide-slate-100">
-                            <!-- Dinámico desde Supabase -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB MAESTROS -->
-        <div id="tab-teachers" class="tab-content hidden flex-1 flex flex-col space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="relative w-full sm:w-80">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="teacher-search" oninput="renderTeachersTable()" placeholder="Buscar por nombre o DUI..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
-                </div>
-                <button onclick="openAddTeacherModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>Nuevo Maestro</span>
-                </button>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3 px-4">Maestro</th>
-                                <th class="py-3 px-4">DUI / Contacto</th>
-                                <th class="py-3 px-4">Nivel Asignado</th>
-                                <th class="py-3 px-4">Rol en Nivel</th>
-                                <th class="py-3 px-4 text-center">DUI Adjunto</th>
-                                <th class="py-3 px-4 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teachers-table-body" class="divide-y divide-slate-100">
-                            <!-- Dinámico desde Supabase -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: ATTENDANCE -->
-        <div id="tab-attendance" class="tab-content hidden flex-1 flex flex-col space-y-4">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <label for="attendance-date" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Fecha:</label>
-                    <input type="date" id="attendance-date" onchange="loadAttendanceForDate()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Maestro</th>
+                                    <th class="py-3 px-4">DUI / Contacto</th>
+                                    <th class="py-3 px-4">Nivel Asignado</th>
+                                    <th class="py-3 px-4">Rol en Nivel</th>
+                                    <th class="py-3 px-4 text-center">DUI Adjunto</th>
+                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachers-table-body" class="divide-y divide-slate-100">
+                                <!-- Dinámico desde Supabase -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3 px-4">Alumno</th>
-                                <th class="py-3 px-4">Maestro Responsable</th>
-                                <th class="py-3 px-4">Nivel</th>
-                                <th class="py-3 px-4 text-center">Marcar Asistencia</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendance-table-body" class="divide-y divide-slate-100">
-                            <!-- Dinámico -->
-                        </tbody>
-                    </table>
+            <!-- TAB 3: ATTENDANCE -->
+            <div id="tab-attendance" class="tab-content hidden flex-1 flex flex-col space-y-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <label for="attendance-date" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Fecha:</label>
+                        <input type="date" id="attendance-date" onchange="loadAttendanceForDate()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Alumno</th>
+                                    <th class="py-3 px-4">Maestro Responsable</th>
+                                    <th class="py-3 px-4">Nivel</th>
+                                    <th class="py-3 px-4 text-center">Marcar Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body" class="divide-y divide-slate-100">
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 4: GRADES -->
-        <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-4">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Módulo:</label>
-                    <select id="grade-period-select" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
-                        <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
-                        <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
-                    </select>
+            <!-- TAB 4: GRADES -->
+            <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Módulo:</label>
+                        <select id="grade-period-select" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
+                            <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
+                            <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
+                        </select>
+                    </div>
+                    <button onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Registrar Nueva Nota</span>
+                    </button>
                 </div>
-                <button onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Registrar Nueva Nota</span>
-                </button>
-            </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                <div class="overflow-x-auto flex-1">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3 px-4">Alumno</th>
-                                <th class="py-3 px-4">Evaluación</th>
-                                <th class="py-3 px-4 text-center">Calificación (0 - 10)</th>
-                                <th class="py-3 px-4">Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody id="grades-table-body" class="divide-y divide-slate-100">
-                            <tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">Selecciona o registra una calificación.</td></tr>
-                        </tbody>
-                    </table>
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Alumno</th>
+                                    <th class="py-3 px-4">Evaluación</th>
+                                    <th class="py-3 px-4 text-center">Calificación (0 - 10)</th>
+                                    <th class="py-3 px-4">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-table-body" class="divide-y divide-slate-100">
+                                <tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">Selecciona o registra una calificación.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 5: DOCUMENTS -->
-        <div id="tab-documents" class="tab-content hidden flex-1 flex flex-col space-y-4">
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-folder-open text-brand-600 mr-2"></i> Expedientes y Documentos de Alumnos</h3>
+            <!-- TAB 5: DOCUMENTS -->
+            <div id="tab-documents" class="tab-content hidden flex-1 flex flex-col space-y-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-folder-open text-brand-600 mr-2"></i> Expedientes y Documentos de Alumnos</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="documents-grid">
+                    <!-- Dinámico -->
+                </div>
             </div>
+        </main>
+    </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="documents-grid">
-                <!-- Dinámico -->
-            </div>
-        </div>
-    </main>
-
-    <!-- MODAL: REGISTRAR / EDITAR ALUMNO AMPLIDO -->
+    <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
     <div id="student-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
@@ -563,19 +611,77 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
-    <!-- LÓGICA INTEGRADORA CON SUPABASE -->
+    <!-- LÓGICA INTEGRADORA CON SUPABASE Y AUTENTICACIÓN -->
     <script>
         const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB"; // <-- Pega tu llave de Supabase aquí
+        const SUPABASE_KEY = "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB";
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let state = { students: [], teachers: [], countAsistencias: 0 };
 
-        window.onload = function() {
+        window.onload = async function() {
             document.getElementById('attendance-date').valueAsDate = new Date();
-            cargarDatos();
+            
+            // Verificar si hay usuario autenticado al abrir la página
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            gestionarEstadoSesion(session);
+
+            // Escuchar cambios de sesión en vivo
+            supabaseClient.auth.onAuthStateChange((_event, session) => {
+                gestionarEstadoSesion(session);
+            });
         };
+
+        function gestionarEstadoSesion(session) {
+            const loginContainer = document.getElementById('login-container');
+            const appContainer = document.getElementById('app-container');
+            const userBadge = document.getElementById('user-email-badge');
+
+            if (session) {
+                loginContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                if (userBadge) {
+                    userBadge.textContent = session.user.email;
+                    userBadge.classList.remove('hidden');
+                }
+                cargarDatos();
+            } else {
+                loginContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            const btn = document.getElementById('btn-login');
+
+            errorDiv.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Accediendo...`;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                errorDiv.textContent = 'Error al ingresar: Credenciales incorrectas o usuario no registrado.';
+                errorDiv.classList.remove('hidden');
+            } else {
+                showToast('¡Bienvenido al sistema!');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>Iniciar Sesión</span>`;
+        }
+
+        async function handleLogout() {
+            if (confirm('¿Desea cerrar la sesión actual?')) {
+                await supabaseClient.auth.signOut();
+                showToast('Sesión cerrada correctamente');
+            }
+        }
 
         async function cargarDatos() {
             await cargarMaestros();
