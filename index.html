@@ -4,330 +4,899 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Alfabetización</title>
-    <!-- Supabase JS Client -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121824;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        h1, h2 {
-            color: #ffffff;
-        }
-        .btn {
-            background-color: #059669;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn:hover {
-            background-color: #047857;
-        }
-        .btn-danger {
-            background-color: #dc2626;
-        }
-        .btn-danger:hover {
-            background-color: #b91c1c;
-        }
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #1f2937;
-            padding: 20px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-        }
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #9ca3af;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #9ca3af;
-            font-weight: bold;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #374151;
-            background-color: #374151;
-            color: white;
-            box-sizing: border-box;
-        }
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-        .form-row .form-group {
-            flex: 1;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #1f2937;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #374151;
-        }
-        th {
-            background-color: #111827;
-            color: #9ca3af;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
 
-<div class="container">
-    <h1>Sistema de Alfabetización</h1>
-    <h2>Directorio de Maestros y Acceso</h2>
-    
-    <button class="btn" onclick="openTeacherModal()">+ Registrar Maestro / Crear Acceso</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>DUI</th>
-                <th>Nivel</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="teachers-table-body">
-            <!-- Se llena dinámicamente -->
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal Registrar Maestro -->
-<div class="modal" id="teacher-modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeTeacherModal()">&times;</span>
-        <h3 id="modal-title">Registrar Maestro / Crear Acceso</h3>
-        <input type="hidden" id="teacher-id">
-        
-        <div class="form-group">
-            <label for="teacher-nombre">Nombre Completo</label>
-            <input type="text" id="teacher-nombre" placeholder="Nombre completo">
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="teacher-email">Correo Electrónico (Login)</label>
-                <input type="email" id="teacher-email" placeholder="correo@ejemplo.com">
+    <!-- LOGIN CONTAINER -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+            <div class="text-center mb-8">
+                <img src="https://raw.githubusercontent.com/carlosnec-code/sistema-alfabetizacion/main/logo.png" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=Logo';" 
+                     alt="Logo Ministerio de Alfabetización" 
+                     class="mx-auto h-24 w-auto mb-4 object-contain">
+                <h1 class="text-2xl font-bold text-slate-800">Ministerio de Alfabetización</h1>
+                <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales para acceder</p>
             </div>
-            <div class="form-group">
-                <label for="teacher-password">Contraseña</label>
-                <input type="password" id="teacher-password" placeholder="••••••">
-                <small style="color: #9ca3af; font-size: 10px;">Requerido para crear nuevo acceso.</small>
-            </div>
-        </div>
+            
+            <form id="login-form" class="space-y-5" onsubmit="event.preventDefault(); handleLogin();">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Correo Electrónico</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 focus:bg-white transition-all" placeholder="ejemplo@correo.com">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Contraseña</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 focus:bg-white transition-all" placeholder="••••••••">
+                    </div>
+                </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="teacher-telefono">Teléfono</label>
-                <input type="text" id="teacher-telefono" placeholder="12345678">
-            </div>
-            <div class="form-group">
-                <label for="teacher-dui">DUI</label>
-                <input type="text" id="teacher-dui" placeholder="12345678-9">
-            </div>
-        </div>
+                <div id="login-error" class="hidden text-red-500 text-xs text-center bg-red-50 p-3 rounded-lg border border-red-100"></div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="teacher-nivel">Nivel Asignado</label>
-                <select id="teacher-nivel">
-                    <option value="1">Nivel 1</option>
-                    <option value="2">Nivel 2</option>
-                    <option value="3">Nivel 3</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="teacher-rol-nivel">Rol de Nivel</label>
-                <select id="teacher-rol-nivel">
-                    <option value="Líder de nivel">Líder de nivel</option>
-                    <option value="Maestro">Maestro</option>
-                </select>
-            </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
-            <button class="btn" style="background-color: #4b5563;" onclick="closeTeacherModal()">Cancelar</button>
-            <button class="btn" onclick="saveTeacher()">Guardar y Dar Acceso</button>
+                <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+            </form>
         </div>
     </div>
-</div>
 
-<script>
-    // ⚠️ REEMPLAZA "TU_NUEVA_CLAVE_ANON_AQUI" CON TU CLAVE ANON DE SUPABASE (Obtenida en Project Settings > API)
-    const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_DFVGrIa0apWrXc2VDOfStg_5SWP2mqe"; 
+    <!-- MAIN APP DASHBOARD -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <!-- NAVBAR -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <i class="fa-solid fa-book-open text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-slate-800 text-lg leading-tight">Sistema de Alfabetización</h2>
+                            <span class="text-xs text-slate-500">Panel de Administración</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="text-right hidden sm:block">
+                            <p id="user-display-name" class="text-sm font-semibold text-slate-700">Cargando...</p>
+                            <p id="user-display-role" class="text-xs text-emerald-600 font-medium">Líder</p>
+                        </div>
+                        <button onclick="handleLogout()" class="p-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cerrar Sesión">
+                            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NAV TABS -->
+            <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto flex space-x-2 sm:space-x-4 overflow-x-auto py-2 scrollbar-none">
+                    <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn active px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-700 bg-emerald-100 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-chart-line"></i> Resumen
+                    </button>
+                    <button onclick="switchTab('tab-alumnos')" id="btn-tab-alumnos" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-user-graduate"></i> Alumnos
+                    </button>
+                    <button onclick="switchTab('tab-maestros')" id="btn-tab-maestros" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-chalkboard-user"></i> Maestros
+                    </button>
+                    <button onclick="switchTab('tab-asistencia')" id="btn-tab-asistencia" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-clipboard-user"></i> Asistencia
+                    </button>
+                    <button onclick="switchTab('tab-calificaciones')" id="btn-tab-calificaciones" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-pen-to-square"></i> Calificaciones
+                    </button>
+                    <button onclick="switchTab('tab-documentos')" id="btn-tab-documentos" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-folder-open"></i> Documentos
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    // Inicialización del cliente Supabase
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        <!-- CONTENT CONTAINERS -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+            
+            <!-- 1. DASHBOARD TAB -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-emerald-100 text-emerald-600 rounded-xl">
+                            <i class="fa-solid fa-user-graduate text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Total Alumnos</p>
+                            <h3 id="stat-alumnos" class="text-2xl font-bold text-slate-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-blue-100 text-blue-600 rounded-xl">
+                            <i class="fa-solid fa-chalkboard-user text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Total Maestros</p>
+                            <h3 id="stat-maestros" class="text-2xl font-bold text-slate-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-purple-100 text-purple-600 rounded-xl">
+                            <i class="fa-solid fa-check-double text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Asistencias Hoy</p>
+                            <h3 id="stat-asistencias" class="text-2xl font-bold text-slate-800">0</h3>
+                        </div>
+                    </div>
+                </div>
 
-    // Cargar datos al iniciar
-    document.addEventListener('DOMContentLoaded', fetchMaestros);
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Últimos Alumnos Registrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3">Responsable</th>
+                                    <th class="p-3">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-students-list">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    // Función para obtener la lista de maestros
-    async function fetchMaestros() {
-        const { data, error } = await supabaseClient
-            .from('maestros')
-            .select('*')
-            .eq('estado', 'Activo');
+            <!-- 2. ALUMNOS TAB -->
+            <div id="tab-alumnos" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+                    <div class="relative w-full sm:w-72">
+                        <input type="text" id="search-student" oninput="renderAlumnosTable()" placeholder="Buscar alumno..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    </div>
+                    <button onclick="openStudentModal()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Nuevo Alumno
+                    </button>
+                </div>
 
-        if (error) {
-            console.error("Error al obtener maestros:", error.message);
-            return;
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">DUI/ID</th>
+                                    <th class="p-3">Edad</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3">Maestro Responsable</th>
+                                    <th class="p-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alumnos-list-body">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MAESTROS TAB -->
+            <div id="tab-maestros" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Directorio de Maestros y Acceso</h3>
+                    <button onclick="openTeacherModal()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Registrar Maestro / Crear Acceso
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Correo</th>
+                                    <th class="p-3">Teléfono</th>
+                                    <th class="p-3">Nivel Asignado</th>
+                                    <th class="p-3">Rol</th>
+                                    <th class="p-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maestros-list-body">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ASISTENCIA TAB -->
+            <div id="tab-asistencia" class="tab-content hidden space-y-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label class="text-sm font-semibold text-slate-700">Fecha:</label>
+                        <input type="date" id="attendance-date" onchange="loadAttendanceList()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <button onclick="saveAttendance()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Asistencias
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3 text-center">Asistencia</th>
+                                    <th class="p-3">Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-list-body">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Selecciona una fecha</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. CALIFICACIONES TAB -->
+            <div id="tab-calificaciones" class="tab-content hidden space-y-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-semibold text-slate-700">Módulo:</label>
+                        <select id="grades-module" onchange="loadGradesList()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm">
+                            <option value="Módulo 1">Módulo 1</option>
+                            <option value="Módulo 2">Módulo 2</option>
+                            <option value="Módulo 3">Módulo 3</option>
+                        </select>
+                    </div>
+                    <button onclick="saveGrades()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Notas
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">Evaluación</th>
+                                    <th class="p-3 w-32">Nota (0 - 10)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-list-body">
+                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Sin datos</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. DOCUMENTOS TAB -->
+            <div id="tab-documentos" class="tab-content hidden space-y-6">
+                <h3 class="text-lg font-bold text-slate-800">Expedientes y Documentos Digitales</h3>
+                <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="p-4 text-center text-slate-400 col-span-full">Cargando expediente...</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL REGISTRO ALUMNO -->
+    <div id="student-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-100 max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="student-modal-title" class="font-bold text-slate-800">Registrar Alumno</h3>
+                <button onclick="closeStudentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="student-form" onsubmit="event.preventDefault(); saveStudent();" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="student-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombres</label>
+                        <input type="text" id="student-nombres" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Apellidos</label>
+                        <input type="text" id="student-apellidos" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">DUI / Identificación</label>
+                        <input type="text" id="student-identificacion" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono</label>
+                        <input type="text" id="student-telefono" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Edad</label>
+                        <input type="number" id="student-edad" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nivel</label>
+                        <select id="student-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                            <option value="Nivel 1">Nivel 1</option>
+                            <option value="Nivel 2">Nivel 2</option>
+                            <option value="Nivel 3">Nivel 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Maestro Responsable</label>
+                    <input type="text" id="student-maestro" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                </div>
+
+                <div class="border-t border-slate-200 pt-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase">Documentos Adjuntos</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Foto Alumno</label>
+                            <input type="file" id="file-foto" class="text-xs w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">DUI Adjunto</label>
+                            <input type="file" id="file-dui" class="text-xs w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Partida Nacimiento</label>
+                            <input type="file" id="file-partida" class="text-xs w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Certificado</label>
+                            <input type="file" id="file-certificado" class="text-xs w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar Alumno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRO MAESTRO Y ACCESO -->
+    <div id="teacher-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="teacher-modal-title" class="font-bold text-slate-800">Registrar Maestro</h3>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="teacher-form" onsubmit="event.preventDefault(); saveTeacher();" class="p-6 space-y-4">
+                <input type="hidden" id="teacher-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="teacher-nombre" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Correo Electrónico (Login)</label>
+                        <input type="email" id="teacher-email" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Contraseña</label>
+                        <input type="password" id="teacher-password" placeholder="Mínimo 6 caracteres" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                        <span class="text-[10px] text-slate-400">Requerido para crear nuevo acceso.</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono</label>
+                        <input type="text" id="teacher-telefono" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">DUI</label>
+                        <input type="text" id="teacher-dui" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nivel Asignado</label>
+                        <select id="teacher-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                            <option value="Nivel 1">Nivel 1</option>
+                            <option value="Nivel 2">Nivel 2</option>
+                            <option value="Nivel 3">Nivel 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Rol de Nivel</label>
+                        <select id="teacher-rol-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                            <option value="Líder de nivel">Líder de nivel</option>
+                            <option value="Sublíder">Sublíder</option>
+                            <option value="Colaborador">Colaborador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeTeacherModal()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar y Dar Acceso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
+        // Usa tu nueva clave pública (anon) activa de Supabase
+        const SUPABASE_ANON_KEY = "sb_publishable_DFVGrIa0apWrXc2VDOfStg_5SWP2mqe"; 
+
+        // Cliente estándar de Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let userProfile = null;
+        let globalAlumnos = [];
+        let globalMaestros = [];
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('attendance-date').valueAsDate = new Date();
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                showAppScreen();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        // LOGIN / LOGOUT
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.classList.add('hidden');
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) {
+                errorDiv.innerText = "Credenciales incorrectas: " + error.message;
+                errorDiv.classList.remove('hidden');
+            } else {
+                currentUser = data.user;
+                await loadUserProfile();
+                showAppScreen();
+            }
         }
 
-        const tbody = document.getElementById('teachers-table-body');
-        tbody.innerHTML = '';
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        }
 
-        data.forEach(teacher => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${teacher.nombre || ''}</td>
-                <td>${teacher.email || ''}</td>
-                <td>${teacher.telefono || ''}</td>
-                <td>${teacher.dui || ''}</td>
-                <td>Nivel ${teacher.nivel_id || ''}</td>
-                <td>${teacher.rol_nivel || ''}</td>
-                <td>
-                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteTeacher('${teacher.id}')">Borrar</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+        async function loadUserProfile() {
+            const { data } = await supabaseClient
+                .from('maestros')
+                .select('*')
+                .eq('email', currentUser.email)
+                .maybeSingle();
 
-    // Modal Control
-    function openTeacherModal() {
-        document.getElementById('teacher-id').value = '';
-        document.getElementById('teacher-nombre').value = '';
-        document.getElementById('teacher-email').value = '';
-        document.getElementById('teacher-password').value = '';
-        document.getElementById('teacher-telefono').value = '';
-        document.getElementById('teacher-dui').value = '';
-        document.getElementById('teacher-modal').style.display = 'flex';
-    }
+            userProfile = data || { nombre: currentUser.email, rol_nivel: 'Líder', rol: 'admin' };
+            document.getElementById('user-display-name').innerText = userProfile.nombre;
+            document.getElementById('user-display-role').innerText = userProfile.rol_nivel || 'Maestro';
+        }
 
-    function closeTeacherModal() {
-        document.getElementById('teacher-modal').style.display = 'none';
-    }
+        function showLoginScreen() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
+        }
 
-    // Guardar Maestro y Crear Usuario en Auth
-    async function saveTeacher() {
-        const id = document.getElementById('teacher-id').value;
-        const email = document.getElementById('teacher-email').value;
-        const password = document.getElementById('teacher-password').value;
-        const nombre = document.getElementById('teacher-nombre').value;
-        const telefono = document.getElementById('teacher-telefono').value;
-        const dui = document.getElementById('teacher-dui').value;
-        const nivel_id = document.getElementById('teacher-nivel').value;
-        const rol_nivel = document.getElementById('teacher-rol-nivel').value;
+        function showAppScreen() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            loadAllData();
+        }
 
-        let authUserId = id;
-
-        // Crear nuevo usuario mediante signUp si es un maestro nuevo
-        if (!id && password) {
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password
+        // TABS NAVIGATION
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                btn.classList.add('text-slate-600');
             });
 
-            if (authError) {
-                alert("Error al crear usuario de acceso: " + authError.message);
-                return;
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-emerald-100', 'text-emerald-700');
+            activeBtn.classList.remove('text-slate-600');
+
+            if (tabId === 'tab-asistencia') loadAttendanceList();
+            if (tabId === 'tab-calificaciones') loadGradesList();
+            if (tabId === 'tab-documentos') renderDocuments();
+        }
+
+        // CARGA DE DATOS
+        async function loadAllData() {
+            await Promise.all([fetchAlumnos(), fetchMaestros()]);
+            updateDashboardStats();
+        }
+
+        async function fetchAlumnos() {
+            const { data } = await supabaseClient.from('alumnos').select('*').order('created_at', { ascending: false });
+            globalAlumnos = data || [];
+            renderAlumnosTable();
+        }
+
+        async function fetchMaestros() {
+            const { data } = await supabaseClient.from('maestros').select('*');
+            globalMaestros = data || [];
+            renderMaestrosTable();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-alumnos').innerText = globalAlumnos.length;
+            document.getElementById('stat-maestros').innerText = globalMaestros.length;
+            
+            const recentBody = document.getElementById('recent-students-list');
+            recentBody.innerHTML = globalAlumnos.slice(0, 5).map(a => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${a.nivel || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${a.maestro_responsable || 'Sin asignar'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md">${a.estado || 'Activo'}</span></td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin alumnos</td></tr>';
+        }
+
+        // MAESTROS CRUD Y REGISTRO DE USUARIOS
+        function renderMaestrosTable() {
+            const tbody = document.getElementById('maestros-list-body');
+            tbody.innerHTML = globalMaestros.map(m => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${m.nombre}</td>
+                    <td class="p-3 text-slate-500">${m.email || 'N/A'}</td>
+                    <td class="p-3 text-slate-500">${m.telefono || 'N/A'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${m.nivel_id || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${m.rol_nivel || 'Colaborador'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editTeacher('${m.id}')" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
+        }
+
+        function openTeacherModal() {
+            document.getElementById('teacher-form').reset();
+            document.getElementById('teacher-id').value = '';
+            document.getElementById('teacher-modal-title').innerText = 'Registrar Maestro / Crear Acceso';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacher-modal').classList.add('hidden');
+        }
+
+        async function saveTeacher() {
+            const id = document.getElementById('teacher-id').value;
+            const email = document.getElementById('teacher-email').value;
+            const password = document.getElementById('teacher-password').value;
+            const nombre = document.getElementById('teacher-nombre').value;
+            const telefono = document.getElementById('teacher-telefono').value;
+            const dui = document.getElementById('teacher-dui').value;
+            const nivel_id = document.getElementById('teacher-nivel').value;
+            const rol_nivel = document.getElementById('teacher-rol-nivel').value;
+
+            let authUserId = id;
+
+            // CREACIÓN DE USUARIO VÍA SIGNUP SEGURO
+            if (!id && password) {
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) {
+                    alert("Error al crear usuario de acceso: " + authError.message);
+                    return;
+                }
+                if (authData?.user) {
+                    authUserId = authData.user.id;
+                }
             }
-            if (authData?.user) {
-                authUserId = authData.user.id;
+
+            const teacherData = {
+                nombre,
+                email,
+                telefono,
+                dui,
+                nivel_id,
+                rol_nivel,
+                estado: 'Activo'
+            };
+
+            if (authUserId) {
+                teacherData.id = authUserId;
+            }
+
+            const { error } = await supabaseClient.from('maestros').upsert(teacherData);
+            if (error) {
+                alert("Error al guardar en la tabla maestros: " + error.message);
+            } else {
+                alert("Maestro guardado con éxito.");
+                closeTeacherModal();
+                fetchMaestros();
             }
         }
 
-        const teacherData = {
-            nombre,
-            email,
-            telefono,
-            dui,
-            nivel_id,
-            rol_nivel,
-            estado: 'Activo'
-        };
-
-        if (authUserId) {
-            teacherData.id = authUserId;
+        function editTeacher(id) {
+            const m = globalMaestros.find(item => item.id === id);
+            if (!m) return;
+            document.getElementById('teacher-id').value = m.id;
+            document.getElementById('teacher-nombre').value = m.nombre || '';
+            document.getElementById('teacher-email').value = m.email || '';
+            document.getElementById('teacher-telefono').value = m.telefono || '';
+            document.getElementById('teacher-dui').value = m.dui || '';
+            document.getElementById('teacher-nivel').value = m.nivel_id || 'Nivel 1';
+            document.getElementById('teacher-rol-nivel').value = m.rol_nivel || 'Líder de nivel';
+            document.getElementById('teacher-modal-title').innerText = 'Editar Maestro';
+            document.getElementById('teacher-modal').classList.remove('hidden');
         }
 
-        const { error } = await supabaseClient.from('maestros').upsert(teacherData);
-        if (error) {
-            alert("Error al guardar en la tabla maestros: " + error.message);
-        } else {
-            alert("Maestro guardado con éxito.");
-            closeTeacherModal();
-            fetchMaestros();
+        // ALUMNOS CRUD
+        function renderAlumnosTable() {
+            const search = document.getElementById('search-student').value.toLowerCase();
+            const filtered = globalAlumnos.filter(a => 
+                (`${a.nombres} ${a.apellidos}`).toLowerCase().includes(search) || 
+                (a.identificacion || '').toLowerCase().includes(search)
+            );
+
+            const tbody = document.getElementById('alumnos-list-body');
+            tbody.innerHTML = filtered.map(a => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                    <td class="p-3 text-slate-500">${a.identificacion || 'N/A'}</td>
+                    <td class="p-3 text-slate-500">${a.edad || 'N/A'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${a.nivel || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${a.maestro_responsable || 'Sin asignar'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editStudent(${a.id})" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteStudent(${a.id})" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin registros de alumnos</td></tr>';
         }
-    }
 
-    // Borrado lógico o físico del maestro
-    async function deleteTeacher(id) {
-        if (!confirm("¿Está seguro de eliminar este maestro?")) return;
-
-        const { error } = await supabaseClient
-            .from('maestros')
-            .update({ estado: 'Inactivo' })
-            .eq('id', id);
-
-        if (error) {
-            alert("Error al borrar: " + error.message);
-        } else {
-            alert("Maestro borrado con éxito.");
-            fetchMaestros();
+        function openStudentModal() {
+            document.getElementById('student-form').reset();
+            document.getElementById('student-id').value = '';
+            document.getElementById('student-modal-title').innerText = 'Registrar Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
         }
-    }
-</script>
+
+        function closeStudentModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+        }
+
+        async function uploadFile(fileInputId, folder) {
+            const input = document.getElementById(fileInputId);
+            if (!input.files || input.files.length === 0) return null;
+            const file = input.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+            const { error } = await supabaseClient.storage.from('documentos_alumnos').upload(fileName, file);
+            if (error) {
+                console.error("Error al subir archivo:", error.message);
+                return null;
+            }
+
+            const { data } = supabaseClient.storage.from('documentos_alumnos').getPublicUrl(fileName);
+            return data.publicUrl;
+        }
+
+        async function saveStudent() {
+            const id = document.getElementById('student-id').value;
+            const nombres = document.getElementById('student-nombres').value;
+            const apellidos = document.getElementById('student-apellidos').value;
+            const identificacion = document.getElementById('student-identificacion').value;
+            const telefono = document.getElementById('student-telefono').value;
+            const edad = parseInt(document.getElementById('student-edad').value) || null;
+            const nivel = document.getElementById('student-nivel').value;
+            const maestro_responsable = document.getElementById('student-maestro').value;
+
+            const foto_url = await uploadFile('file-foto', 'fotos');
+            const dui_url = await uploadFile('file-dui', 'duis');
+            const partida_url = await uploadFile('file-partida', 'partidas');
+            const certificado_url = await uploadFile('file-certificado', 'certificados');
+
+            const payload = {
+                nombres, apellidos, identificacion, telefono, edad, nivel, maestro_responsable, estado: 'Activo'
+            };
+
+            if (foto_url) payload.foto_url = foto_url;
+            if (dui_url) payload.dui_url = dui_url;
+            if (partida_url) payload.partida_url = partida_url;
+            if (certificado_url) payload.certificado_url = certificado_url;
+
+            let query = supabaseClient.from('alumnos');
+            if (id) {
+                await query.update(payload).eq('id', id);
+            } else {
+                await query.insert([payload]);
+            }
+
+            closeStudentModal();
+            fetchAlumnos();
+        }
+
+        function editStudent(id) {
+            const a = globalAlumnos.find(item => item.id === id);
+            if (!a) return;
+            document.getElementById('student-id').value = a.id;
+            document.getElementById('student-nombres').value = a.nombres || '';
+            document.getElementById('student-apellidos').value = a.apellidos || '';
+            document.getElementById('student-identificacion').value = a.identificacion || '';
+            document.getElementById('student-telefono').value = a.telefono || '';
+            document.getElementById('student-edad').value = a.edad || '';
+            document.getElementById('student-nivel').value = a.nivel || 'Nivel 1';
+            document.getElementById('student-maestro').value = a.maestro_responsable || '';
+            document.getElementById('student-modal-title').innerText = 'Editar Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        async function deleteStudent(id) {
+            if (confirm("¿Estás seguro de eliminar este alumno?")) {
+                await supabaseClient.from('alumnos').delete().eq('id', id);
+                fetchAlumnos();
+            }
+        }
+
+        // ASISTENCIA
+        async function loadAttendanceList() {
+            const fecha = document.getElementById('attendance-date').value;
+            const { data: asistencias } = await supabaseClient.from('asistencia').select('*').eq('fecha', fecha);
+
+            const mapAsistencia = {};
+            (asistencias || []).forEach(a => {
+                mapAsistencia[a.alumno_id] = a;
+            });
+
+            const tbody = document.getElementById('attendance-list-body');
+            tbody.innerHTML = globalAlumnos.map(a => {
+                const reg = mapAsistencia[a.id] || {};
+                const presente = reg.presente !== undefined ? reg.presente : true;
+                const obs = reg.observacion || '';
+                return `
+                    <tr class="border-b border-slate-100" data-alumno-id="${a.id}">
+                        <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                        <td class="p-3 text-slate-500">${a.nivel}</td>
+                        <td class="p-3 text-center">
+                            <input type="checkbox" class="attendance-check h-5 w-5 text-emerald-600 rounded" ${presente ? 'checked' : ''}>
+                        </td>
+                        <td class="p-3">
+                            <input type="text" class="attendance-obs w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs" value="${obs}" placeholder="Sin observaciones">
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin alumnos registrados</td></tr>';
+        }
+
+        async function saveAttendance() {
+            const fecha = document.getElementById('attendance-date').value;
+            const rows = document.querySelectorAll('#attendance-list-body tr[data-alumno-id]');
+            
+            const records = [];
+            rows.forEach(row => {
+                const alumno_id = parseInt(row.getAttribute('data-alumno-id'));
+                const presente = row.querySelector('.attendance-check').checked;
+                const observacion = row.querySelector('.attendance-obs').value;
+                records.push({ alumno_id, fecha, presente, observacion });
+            });
+
+            if (records.length > 0) {
+                await supabaseClient.from('asistencia').delete().eq('fecha', fecha);
+                const { error } = await supabaseClient.from('asistencia').insert(records);
+                if (error) alert("Error al guardar asistencia: " + error.message);
+                else alert("Asistencias guardadas correctamente.");
+            }
+        }
+
+        // CALIFICACIONES
+        async function loadGradesList() {
+            const modulo = document.getElementById('grades-module').value;
+            const { data: notas } = await supabaseClient.from('calificaciones').select('*').eq('modulo', modulo);
+
+            const mapNotas = {};
+            (notas || []).forEach(n => {
+                mapNotas[n.alumno_id] = n;
+            });
+
+            const tbody = document.getElementById('grades-list-body');
+            tbody.innerHTML = globalAlumnos.map(a => {
+                const reg = mapNotas[a.id] || {};
+                return `
+                    <tr class="border-b border-slate-100" data-alumno-id="${a.id}">
+                        <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                        <td class="p-3 text-slate-500">${modulo}</td>
+                        <td class="p-3">
+                            <input type="number" min="0" max="10" step="0.1" class="grade-input w-24 bg-slate-50 border border-slate-200 rounded p-1 text-sm font-bold text-center" value="${reg.nota !== undefined ? reg.nota : ''}">
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">Sin alumnos registrados</td></tr>';
+        }
+
+        async function saveGrades() {
+            const modulo = document.getElementById('grades-module').value;
+            const rows = document.querySelectorAll('#grades-list-body tr[data-alumno-id]');
+            const fechaHoy = new Date().toISOString().split('T')[0];
+
+            const records = [];
+            rows.forEach(row => {
+                const alumno_id = parseInt(row.getAttribute('data-alumno-id'));
+                const val = row.querySelector('.grade-input').value;
+                if (val !== '') {
+                    records.push({
+                        alumno_id,
+                        modulo,
+                        evaluacion: 'Evaluación Módulo',
+                        nota: parseFloat(val),
+                        fecha: fechaHoy
+                    });
+                }
+            });
+
+            if (records.length > 0) {
+                await supabaseClient.from('calificaciones').delete().eq('modulo', modulo);
+                const { error } = await supabaseClient.from('calificaciones').insert(records);
+                if (error) alert("Error al guardar calificaciones: " + error.message);
+                else alert("Calificaciones guardadas exitosamente.");
+            }
+        }
+
+        // DOCUMENTOS
+        function renderDocuments() {
+            const grid = document.getElementById('documents-grid');
+            grid.innerHTML = globalAlumnos.map(a => `
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center gap-3">
+                        <img src="${a.foto_url || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-slate-100">
+                        <div>
+                            <h4 class="font-bold text-slate-800">${a.nombres} ${a.apellidos}</h4>
+                            <p class="text-xs text-slate-500">${a.nivel}</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3 grid grid-cols-2 gap-2 text-xs">
+                        ${a.dui_url ? `<a href="${a.dui_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-id-card"></i> DUI</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin DUI</span>'}
+                        ${a.partida_url ? `<a href="${a.partida_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-file"></i> Partida</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin Partida</span>'}
+                        ${a.certificado_url ? `<a href="${a.certificado_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-certificate"></i> Certificado</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin Certificado</span>'}
+                    </div>
+                </div>
+            `).join('') || '<div class="p-4 text-center text-slate-400 col-span-full">Sin expediente registrado</div>';
+        }
+    </script>
 </body>
 </html>
