@@ -450,7 +450,7 @@
     <!-- LOGICA JAVASCRIPT -->
     <script>
         const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
-        // Usa tu nueva clave pública (anon) activa de Supabase
+        // Usa tu clave pública (anon) activa de Supabase
         const SUPABASE_ANON_KEY = "sb_publishable_DFVGrIa0apWrXc2VDOfStg_5SWP2mqe"; 
 
         // Cliente estándar de Supabase
@@ -643,7 +643,10 @@
             if (!id && password) {
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
-                    password: password
+                    password: password,
+                    options: {
+                        data: { nombre_completo: nombre }
+                    }
                 });
 
                 if (authError) {
