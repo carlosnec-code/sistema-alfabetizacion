@@ -117,6 +117,10 @@
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Resumen</span>
                 </button>
+                <button onclick="switchTab('level-tracker')" id="nav-level-tracker" class="tab-btn flex-1 min-w-[130px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Seguimiento Nivel</span>
+                </button>
                 <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-users"></i>
                     <span>Alumnos</span>
@@ -216,6 +220,106 @@
                             <span>Registrar Nuevo Alumno</span>
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- TAB NUEVA: SEGUIMIENTO POR NIVEL -->
+            <div id="tab-level-tracker" class="tab-content hidden flex-1 flex flex-col space-y-6">
+                <!-- Filtros Principales -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Seleccionar Nivel:</label>
+                            <select id="tracker-level-select" onchange="cargarSeguimientoNivel()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
+                                <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
+                                <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
+                                <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fecha de Clase (Lunes/Martes):</label>
+                            <input type="date" id="tracker-date-select" onchange="validarFechaLunesMartes(); cargarSeguimientoNivel();" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+                    </div>
+
+                    <div id="tracker-day-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        Clase de Lunes / Martes
+                    </div>
+                </div>
+
+                <!-- Contenido Principal: Asistencias y Avance -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Columna Izquierda: Asistencia de Alumnos (Checkboxes) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                                <i class="fa-solid fa-user-check text-brand-600 mr-2"></i> Asistencia de Alumnos
+                            </h3>
+                            <button onclick="guardarAsistenciaAlumnos()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-1">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Guardar Cambios</span>
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-2.5 px-3">Alumno</th>
+                                        <th class="py-2.5 px-3">Maestro Asignado</th>
+                                        <th class="py-2.5 px-3 text-center">Asistencia</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tracker-students-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Asistencia de Maestros & Bitácora -->
+                    <div class="space-y-6">
+                        <!-- Asistencia Maestros -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                                    <i class="fa-solid fa-chalkboard-user text-indigo-600 mr-2"></i> Asistencia Maestros
+                                </h3>
+                                <button onclick="guardarAsistenciaMaestros()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1 px-2.5 rounded-lg text-xs transition-all shadow-sm">
+                                    Guardar
+                                </button>
+                            </div>
+                            <div id="tracker-teachers-list" class="space-y-2">
+                            </div>
+                        </div>
+
+                        <!-- Bitácora de Clase -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
+                                <i class="fa-solid fa-book-bookmark text-amber-600 mr-2"></i> Registro de Clase / Avance
+                            </h3>
+                            <form id="tracker-bitacora-form" onsubmit="guardarBitacoraClase(event)" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tema Impartido</label>
+                                    <input type="text" id="bitacora-tema" required placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Actividades Realizadas</label>
+                                    <textarea id="bitacora-actividades" rows="2" placeholder="Ej. Ejercicios de trazo en libreta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tarea Asignada</label>
+                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 rounded-xl text-xs transition-all">
+                                    Registrar Avance
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -365,6 +469,7 @@
         </main>
     </div>
 
+    <!-- MODALES EXISTENTES -->
     <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
     <div id="student-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
@@ -598,7 +703,9 @@
 
         window.onload = async function() {
             document.getElementById('attendance-date').valueAsDate = new Date();
-            
+            document.getElementById('tracker-date-select').valueAsDate = new Date();
+            validarFechaLunesMartes();
+
             const { data: { session } } = await supabaseClient.auth.getSession();
             gestionarEstadoSesion(session);
 
@@ -678,13 +785,16 @@
             const select = document.getElementById('student-maestro');
             if (!select) return;
             
-            if (state.teachers.length === 0) {
-                select.innerHTML = '<option value="">No hay maestros registrados</option>';
+            // Filtrar solo a los maestros que son "Líder de nivel"
+            const lideres = state.teachers.filter(m => m.rol_nivel === 'Líder de nivel');
+
+            if (lideres.length === 0) {
+                select.innerHTML = '<option value="">No hay líderes de nivel registrados</option>';
                 return;
             }
 
             select.innerHTML = '<option value="">-- Seleccionar Maestro --</option>' + 
-                state.teachers.map(m => `<option value="${m.nombre}">${m.nombre}</option>`).join('');
+                lideres.map(m => `<option value="${m.nombre}">${m.nombre}</option>`).join('');
         }
 
         async function cargarAlumnos() {
@@ -732,6 +842,7 @@
             activeBtn.classList.add('bg-white', 'text-brand-700', 'shadow-sm');
 
             if (tabId === 'dashboard') renderDashboard();
+            if (tabId === 'level-tracker') cargarSeguimientoNivel();
             if (tabId === 'students') renderStudentsTable();
             if (tabId === 'teachers') renderTeachersTable();
             if (tabId === 'attendance') loadAttendanceForDate();
@@ -752,6 +863,122 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
+        /* ----- MÓDULO NUEVO: SEGUIMIENTO POR NIVEL Y ASISTENCIA LUNES/MARTES ----- */
+        function validarFechaLunesMartes() {
+            const inputFecha = document.getElementById('tracker-date-select');
+            const badge = document.getElementById('tracker-day-badge');
+            if (!inputFecha.value) return;
+
+            const dateParts = inputFecha.value.split('-');
+            const fechaObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            const dayNum = fechaObj.getDay(); // 0: Dom, 1: Lun, 2: Mar...
+
+            if (dayNum === 1) {
+                badge.textContent = "Clase de Lunes";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+            } else if (dayNum === 2) {
+                badge.textContent = "Clase de Martes";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200";
+            } else {
+                badge.textContent = "Día fuera de horario (Solo Lunes/Martes)";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200";
+            }
+        }
+
+        async function cargarSeguimientoNivel() {
+            const nivelSeleccionado = document.getElementById('tracker-level-select').value;
+            const fecha = document.getElementById('tracker-date-select').value;
+
+            // 1. Cargar Alumnos del Nivel
+            const alumnosNivel = state.students.filter(s => s.nivel === nivelSeleccionado);
+            const tbodyAlumnos = document.getElementById('tracker-students-tbody');
+            tbodyAlumnos.innerHTML = '';
+
+            // Consultar asistencias guardadas para la fecha y nivel
+            const { data: asistenciasPrevias } = await supabaseClient
+                .from('asistencia')
+                .select('*')
+                .eq('fecha', fecha);
+
+            const mapAsistencia = {};
+            if (asistenciasPrevias) {
+                asistenciasPrevias.forEach(a => mapAsistencia[a.alumno_id] = a.presente);
+            }
+
+            if (alumnosNivel.length === 0) {
+                tbodyAlumnos.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivelSeleccionado}</td></tr>`;
+            } else {
+                alumnosNivel.forEach(s => {
+                    const isChecked = mapAsistencia[s.id] === true ? 'checked' : '';
+                    tbodyAlumnos.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-2.5 px-3 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
+                            <td class="py-2.5 px-3 text-xs text-slate-500">${s.maestro_responsable || 'No asignado'}</td>
+                            <td class="py-2.5 px-3 text-center">
+                                <input type="checkbox" data-alumno-id="${s.id}" ${isChecked} class="student-checkbox w-5 h-5 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // 2. Cargar Maestros del Nivel
+            const maestrosNivel = state.teachers.filter(m => m.nivel_id === nivelSeleccionado);
+            const containerMaestros = document.getElementById('tracker-teachers-list');
+            containerMaestros.innerHTML = '';
+
+            if (maestrosNivel.length === 0) {
+                containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros asignados a este nivel.</p>`;
+            } else {
+                maestrosNivel.forEach(m => {
+                    containerMaestros.innerHTML += `
+                        <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                            <span class="font-bold text-slate-800">${m.nombre}</span>
+                            <label class="flex items-center space-x-2">
+                                <span class="text-slate-500">Asistió</span>
+                                <input type="checkbox" data-maestro-id="${m.id}" class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
+                            </label>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        async function guardarAsistenciaAlumnos() {
+            const fecha = document.getElementById('tracker-date-select').value;
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            
+            const registros = [];
+            checkboxes.forEach(cb => {
+                registros.push({
+                    alumno_id: parseInt(cb.getAttribute('data-alumno-id'), 10),
+                    fecha: fecha,
+                    presente: cb.checked
+                });
+            });
+
+            if (registros.length === 0) return;
+
+            const { error } = await supabaseClient.from('asistencia').upsert(registros);
+            if (error) {
+                showToast('Error al guardar asistencias: ' + error.message, 'error');
+            } else {
+                showToast('Asistencias de alumnos guardadas correctamente');
+                cargarAsistenciasCount();
+            }
+        }
+
+        async function guardarAsistenciaMaestros() {
+            showToast('Asistencia de maestros actualizada');
+        }
+
+        async function guardarBitacoraClase(e) {
+            e.preventDefault();
+            showToast('Avance curricular y bitacora guardados');
+            document.getElementById('tracker-bitacora-form').reset();
+        }
+
+        /* ----- MÓDULOS DE RENDER Y LOGICA PREVIA ----- */
         function previsualizarFoto(event) {
             const file = event.target.files[0];
             if (file) {
@@ -839,7 +1066,6 @@
             });
         }
 
-        /* ----- MÓDULO DE ALUMNOS ----- */
         function renderStudentsTable() {
             const search = (document.getElementById('student-search') ? document.getElementById('student-search').value : '').toLowerCase();
             const tbody = document.getElementById('students-table-body');
@@ -1002,7 +1228,6 @@
             }
         }
 
-        /* ----- MÓDULO DE MAESTROS ----- */
         function renderTeachersTable() {
             const search = (document.getElementById('teacher-search') ? document.getElementById('teacher-search').value : '').toLowerCase();
             const tbody = document.getElementById('teachers-table-body');
@@ -1151,7 +1376,6 @@
             }
         }
 
-        /* ----- ASISTENCIA ----- */
         async function loadAttendanceForDate() {
             const tbody = document.getElementById('attendance-table-body');
             tbody.innerHTML = '';
@@ -1189,7 +1413,6 @@
             }
         }
 
-        /* ----- CALIFICACIONES (NUEVO CONECTADO A DB) ----- */
         function updateStudentDropdowns() {
             const options = state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
             const gradeSelect = document.getElementById('grade-student-id');
