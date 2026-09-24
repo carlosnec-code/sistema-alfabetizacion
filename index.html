@@ -220,10 +220,11 @@
                                     <th class="p-3">Teléfono</th>
                                     <th class="p-3">Nivel Asignado</th>
                                     <th class="p-3">Rol</th>
+                                    <th class="p-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="maestros-list-body">
-                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Sin datos</td></tr>
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -404,7 +405,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Contraseña</label>
                         <input type="password" id="teacher-password" placeholder="Mínimo 6 caracteres" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
-                        <span class="text-[10px] text-slate-400">Requerido para crear nuevo acceso.</span>
+                        <span class="text-[10px] text-slate-400">Solo para nuevo acceso.</span>
                     </div>
                 </div>
 
@@ -440,7 +441,7 @@
 
                 <div class="pt-4 flex justify-end gap-3">
                     <button type="button" onclick="closeTeacherModal()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar y Dar Acceso</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar Maestro</button>
                 </div>
             </form>
         </div>
@@ -580,8 +581,12 @@
                     <td class="p-3 text-slate-500">${m.telefono || 'N/A'}</td>
                     <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${m.nivel_id || 'N/A'}</span></td>
                     <td class="p-3 text-slate-500">${m.rol_nivel || 'Colaborador'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editTeacher('${m.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTeacher('${m.id}')" class="text-red-600 hover:text-red-800 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
+            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
         }
 
         function openTeacherModal() {
@@ -593,6 +598,33 @@
 
         function closeTeacherModal() {
             document.getElementById('teacher-modal').classList.add('hidden');
+        }
+
+        function editTeacher(id) {
+            const m = globalMaestros.find(item => item.id === id);
+            if (!m) return;
+            document.getElementById('teacher-id').value = m.id;
+            document.getElementById('teacher-nombre').value = m.nombre || '';
+            document.getElementById('teacher-email').value = m.email || '';
+            document.getElementById('teacher-telefono').value = m.telefono || '';
+            document.getElementById('teacher-dui').value = m.dui || '';
+            document.getElementById('teacher-nivel').value = m.nivel_id || 'Nivel 1';
+            document.getElementById('teacher-rol-nivel').value = m.rol_nivel || 'Colaborador';
+            document.getElementById('teacher-password').value = ''; // La contraseña no se llena por seguridad
+            document.getElementById('teacher-modal-title').innerText = 'Editar Maestro';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        async function deleteTeacher(id) {
+            if (confirm("¿Estás seguro de eliminar este maestro?")) {
+                const { error } = await supabaseClient.from('maestros').delete().eq('id', id);
+                if (error) {
+                    alert("Error al eliminar maestro: " + error.message);
+                } else {
+                    alert("Maestro eliminado con éxito.");
+                    fetchMaestros();
+                }
+            }
         }
 
         async function saveTeacher() {
@@ -607,7 +639,7 @@
 
             let authUserId = id;
 
-            // CREACIÓN DE USUARIO VÍA SIGNUP SEGURO
+            // CREACIÓN DE USUARIO VÍA SIGNUP SOLO SI ES NUEVO Y TIENE CONTRASEÑA
             if (!id && password) {
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
@@ -664,8 +696,8 @@
                     <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${a.nivel || 'N/A'}</span></td>
                     <td class="p-3 text-slate-500">${a.maestro_responsable || 'Sin asignar'}</td>
                     <td class="p-3 text-right">
-                        <button onclick="editStudent(${a.id})" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteStudent(${a.id})" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="editStudent(${a.id})" class="text-blue-600 hover:text-blue-800 p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteStudent(${a.id})" class="text-red-600 hover:text-red-800 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin registros de alumnos</td></tr>';
