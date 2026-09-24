@@ -1,546 +1,437 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Alfabetización de Adultos</title>
+    <title>Sistema de Alfabetización</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase Client JS -->
+    <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-full flex flex-col">
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen">
 
-    <!-- SECCIÓN DE LOGIN (Se muestra si NO hay sesión) -->
-    <div id="login-container" class="min-h-screen flex items-center justify-center bg-slate-100 p-4 w-full">
-        <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full max-w-md">
-            <div class="text-center mb-6">
-                <img src="logo.png" alt="Logo Ministerio" class="w-20 h-20 mx-auto mb-3 object-contain rounded-full shadow-sm">
-                <h2 class="text-xl font-bold text-slate-900">Ministerio de Alfabetización</h2>
-                <p class="text-xs text-slate-500">Ingresa tus credenciales para acceder</p>
+    <!-- LOGIN CONTAINER -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+            <div class="text-center mb-8">
+                <img src="https://raw.githubusercontent.com/carlosnec-code/sistema-alfabetizacion/main/logo.png" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/100?text=Logo';" 
+                     alt="Logo Ministerio de Alfabetización" 
+                     class="mx-auto h-24 w-auto mb-4 object-contain">
+                <h1 class="text-2xl font-bold text-slate-800">Ministerio de Alfabetización</h1>
+                <p class="text-slate-500 text-sm mt-1">Ingresa tus credenciales para acceder</p>
             </div>
-
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+            
+            <form id="login-form" class="space-y-5" onsubmit="event.preventDefault(); handleLogin();">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Correo Electrónico</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
-                        <input type="email" id="login-email" required placeholder="correo@ejemplo.com" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="email" id="login-email" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 focus:bg-white transition-all" placeholder="ejemplo@correo.com">
                     </div>
                 </div>
-
+                
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña</label>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Contraseña</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500 focus:bg-white transition-all" placeholder="••••••••">
                     </div>
                 </div>
 
-                <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 p-2.5 rounded-xl font-medium"></div>
+                <div id="login-error" class="hidden text-red-500 text-xs text-center bg-red-50 p-3 rounded-lg border border-red-100"></div>
 
-                <button type="submit" id="btn-login" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span>Iniciar Sesión</span>
+                <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- ESTRUCTURA PRINCIPAL DE LA APP (Se oculta hasta verificar login) -->
-    <div id="app-container" class="hidden h-full flex flex-col">
-        <!-- App Header -->
-        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <!-- Logo del Ministerio -->
-                    <img src="logo.png" alt="Logo Ministerio de Alfabetización" class="w-12 h-12 object-contain rounded-full shadow-sm">
+    <!-- MAIN APP DASHBOARD -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <!-- NAVBAR -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <i class="fa-solid fa-book-open text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-slate-800 text-lg leading-tight">Sistema de Alfabetización</h2>
+                            <span class="text-xs text-slate-500">Panel de Administración</span>
+                        </div>
+                    </div>
                     
-                    <div>
-                        <h1 class="text-lg font-bold text-slate-900 leading-tight">Ministerio de Alfabetización</h1>
-                        <p class="text-xs text-slate-500">Gestión Integral de Adultos</p>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right hidden sm:block">
+                            <p id="user-display-name" class="text-sm font-semibold text-slate-700">Cargando...</p>
+                            <p id="user-display-role" class="text-xs text-emerald-600 font-medium">Líder</p>
+                        </div>
+                        <button onclick="handleLogout()" class="p-2.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Cerrar Sesión">
+                            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Estado de la Base de Datos y Perfil -->
-                <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="db-status-text">Supabase Conectado</span>
-                    </div>
-
-                    <div id="user-email-badge" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 hidden sm:block">
-                        <!-- Correo de usuario -->
-                    </div>
-
-                    <!-- Botón Cerrar Sesión -->
-                    <button onclick="handleLogout()" title="Cerrar Sesión" class="h-9 w-9 rounded-full bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm border border-red-200 transition-colors">
-                        <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            
+            <!-- NAV TABS -->
+            <div class="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto flex space-x-2 sm:space-x-4 overflow-x-auto py-2 scrollbar-none">
+                    <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn active px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-700 bg-emerald-100 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-chart-line"></i> Resumen
+                    </button>
+                    <button onclick="switchTab('tab-alumnos')" id="btn-tab-alumnos" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-user-graduate"></i> Alumnos
+                    </button>
+                    <button onclick="switchTab('tab-maestros')" id="btn-tab-maestros" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-chalkboard-user"></i> Maestros
+                    </button>
+                    <button onclick="switchTab('tab-asistencia')" id="btn-tab-asistencia" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-clipboard-user"></i> Asistencia
+                    </button>
+                    <button onclick="switchTab('tab-calificaciones')" id="btn-tab-calificaciones" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-pen-to-square"></i> Calificaciones
+                    </button>
+                    <button onclick="switchTab('tab-documentos')" id="btn-tab-documentos" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-200/60 flex items-center gap-2 whitespace-nowrap transition-all">
+                        <i class="fa-solid fa-folder-open"></i> Documentos
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Container with Tabs -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
-            <!-- Navigation Bar -->
-            <div class="flex space-x-1 sm:space-x-2 bg-slate-200/70 p-1.5 rounded-2xl mb-6 overflow-x-auto">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 bg-white text-brand-700 shadow-sm">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span>Resumen</span>
-                </button>
-                <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Alumnos</span>
-                </button>
-                <button onclick="switchTab('teachers')" id="nav-teachers" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                    <span>Maestros</span>
-                </button>
-                <button onclick="switchTab('attendance')" id="nav-attendance" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span>Asistencia</span>
-                </button>
-                <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-clipboard-list"></i>
-                    <span>Calificaciones</span>
-                </button>
-                <button onclick="switchTab('documents')" id="nav-documents" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-folder-open"></i>
-                    <span>Documentos</span>
-                </button>
-            </div>
-
-            <!-- TAB 1: DASHBOARD -->
-            <div id="tab-dashboard" class="tab-content flex-1 flex flex-col space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Alumnos</p>
-                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-students">0</h3>
+        <!-- CONTENT CONTAINERS -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+            
+            <!-- 1. DASHBOARD TAB -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-emerald-100 text-emerald-600 rounded-xl">
+                            <i class="fa-solid fa-user-graduate text-2xl"></i>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-user-graduate"></i>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Total Alumnos</p>
+                            <h3 id="stat-alumnos" class="text-2xl font-bold text-slate-800">0</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Asistencias Tomadas</p>
-                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-avg-attendance">0</h3>
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-blue-100 text-blue-600 rounded-xl">
+                            <i class="fa-solid fa-chalkboard-user text-2xl"></i>
                         </div>
-                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-calendar-check"></i>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Total Maestros</p>
+                            <h3 id="stat-maestros" class="text-2xl font-bold text-slate-800">0</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="p-4 bg-purple-100 text-purple-600 rounded-xl">
+                            <i class="fa-solid fa-check-double text-2xl"></i>
+                        </div>
                         <div>
-                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos Nivel 0</p>
-                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-nivel0">0</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-book-open"></i>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Con Documentos</p>
-                            <h3 class="text-2xl font-bold text-slate-900 mt-1" id="stat-total-docs">0</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Asistencias Hoy</p>
+                            <h3 id="stat-asistencias" class="text-2xl font-bold text-slate-800">0</h3>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Recent Activity -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
-                        <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center">
-                            <i class="fa-solid fa-bolt text-brand-600 mr-2"></i> Alumnos Registrados Recientemente
-                        </h3>
-                        <div class="overflow-x-auto flex-1">
-                            <table class="w-full text-left border-collapse text-sm">
-                                <thead>
-                                    <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                        <th class="pb-3 font-medium">Alumno</th>
-                                        <th class="pb-3 font-medium">Maestro Responsable</th>
-                                        <th class="pb-3 font-medium">Nivel</th>
-                                        <th class="pb-3 font-medium text-right">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashboard-students-list" class="divide-y divide-slate-100">
-                                    <!-- Dinámico desde Supabase -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="bg-gradient-to-br from-brand-600 to-emerald-700 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
-                        <div>
-                            <div class="bg-white/15 w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white">
-                                <i class="fa-solid fa-cloud"></i>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Base de Datos Supabase</h3>
-                            <p class="text-xs text-brand-100 leading-relaxed mb-4">
-                                Los datos y expedientes adjuntos se almacenan de forma segura en la nube de Supabase.
-                            </p>
-                        </div>
-                        <button onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-user-plus"></i>
-                            <span>Registrar Nuevo Alumno</span>
-                        </button>
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Últimos Alumnos Registrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold">
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3">Responsable</th>
+                                    <th class="p-3">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-students-list">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Cargando...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: STUDENTS -->
-            <div id="tab-students" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="relative w-full sm:w-80">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
-                        <input type="text" id="student-search" oninput="renderStudentsTable()" placeholder="Buscar por nombre, documento o maestro..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+            <!-- 2. ALUMNOS TAB -->
+            <div id="tab-alumnos" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+                    <div class="relative w-full sm:w-72">
+                        <input type="text" id="search-student" oninput="renderAlumnosTable()" placeholder="Buscar alumno..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
                     </div>
-                    <button onclick="openAddStudentModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Nuevo Alumno</span>
+                    <button onclick="openStudentModal()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Nuevo Alumno
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Alumno</th>
-                                    <th class="py-3 px-4">Contacto / Cédula</th>
-                                    <th class="py-3 px-4">Maestro Responsable</th>
-                                    <th class="py-3 px-4">Nivel Alfabetización</th>
-                                    <th class="py-3 px-4 text-center">Adjuntos</th>
-                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">DUI/ID</th>
+                                    <th class="p-3">Edad</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3">Maestro Responsable</th>
+                                    <th class="p-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="students-table-body" class="divide-y divide-slate-100">
-                                <!-- Dinámico desde Supabase -->
+                            <tbody id="alumnos-list-body">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB MAESTROS -->
-            <div id="tab-teachers" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="relative w-full sm:w-80">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
-                        <input type="text" id="teacher-search" oninput="renderTeachersTable()" placeholder="Buscar por nombre o DUI..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
-                    </div>
-                    <button onclick="openAddTeacherModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span>Nuevo Maestro</span>
+            <!-- 3. MAESTROS TAB -->
+            <div id="tab-maestros" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Directorio de Maestros y Acceso</h3>
+                    <button onclick="openTeacherModal()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Registrar Maestro / Crear Acceso
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Maestro</th>
-                                    <th class="py-3 px-4">DUI / Contacto</th>
-                                    <th class="py-3 px-4">Nivel Asignado</th>
-                                    <th class="py-3 px-4">Rol en Nivel</th>
-                                    <th class="py-3 px-4 text-center">DUI Adjunto</th>
-                                    <th class="py-3 px-4 text-right">Acciones</th>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Correo</th>
+                                    <th class="p-3">Teléfono</th>
+                                    <th class="p-3">Nivel Asignado</th>
+                                    <th class="p-3">Rol</th>
+                                    <th class="p-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="teachers-table-body" class="divide-y divide-slate-100">
-                                <!-- Dinámico desde Supabase -->
+                            <tbody id="maestros-list-body">
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: ATTENDANCE -->
-            <div id="tab-attendance" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <label for="attendance-date" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Fecha:</label>
-                        <input type="date" id="attendance-date" onchange="loadAttendanceForDate()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <!-- 4. ASISTENCIA TAB -->
+            <div id="tab-asistencia" class="tab-content hidden space-y-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label class="text-sm font-semibold text-slate-700">Fecha:</label>
+                        <input type="date" id="attendance-date" onchange="loadAttendanceList()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500">
                     </div>
+                    <button onclick="saveAttendance()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Asistencias
+                    </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Alumno</th>
-                                    <th class="py-3 px-4">Maestro Responsable</th>
-                                    <th class="py-3 px-4">Nivel</th>
-                                    <th class="py-3 px-4 text-center">Marcar Asistencia</th>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">Nivel</th>
+                                    <th class="p-3 text-center">Asistencia</th>
+                                    <th class="p-3">Observación</th>
                                 </tr>
                             </thead>
-                            <tbody id="attendance-table-body" class="divide-y divide-slate-100">
-                                <!-- Dinámico -->
+                            <tbody id="attendance-list-body">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Selecciona una fecha</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 4: GRADES -->
-            <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Módulo:</label>
-                        <select id="grade-period-select" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                            <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
-                            <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
-                            <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
+            <!-- 5. CALIFICACIONES TAB -->
+            <div id="tab-calificaciones" class="tab-content hidden space-y-6">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-semibold text-slate-700">Módulo:</label>
+                        <select id="grades-module" onchange="loadGradesList()" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm">
+                            <option value="Módulo 1">Módulo 1</option>
+                            <option value="Módulo 2">Módulo 2</option>
+                            <option value="Módulo 3">Módulo 3</option>
                         </select>
                     </div>
-                    <button onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Registrar Nueva Nota</span>
+                    <button onclick="saveGrades()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Notas
                     </button>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Alumno</th>
-                                    <th class="py-3 px-4">Evaluación</th>
-                                    <th class="py-3 px-4 text-center">Calificación (0 - 10)</th>
-                                    <th class="py-3 px-4">Fecha</th>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3">Alumno</th>
+                                    <th class="p-3">Evaluación</th>
+                                    <th class="p-3 w-32">Nota (0 - 10)</th>
                                 </tr>
                             </thead>
-                            <tbody id="grades-table-body" class="divide-y divide-slate-100">
-                                <tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">Selecciona o registra una calificación.</td></tr>
+                            <tbody id="grades-list-body">
+                                <tr><td colspan="3" class="p-4 text-center text-slate-400">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 5: DOCUMENTS -->
-            <div id="tab-documents" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-folder-open text-brand-600 mr-2"></i> Expedientes y Documentos de Alumnos</h3>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="documents-grid">
-                    <!-- Dinámico -->
+            <!-- 6. DOCUMENTOS TAB -->
+            <div id="tab-documentos" class="tab-content hidden space-y-6">
+                <h3 class="text-lg font-bold text-slate-800">Expedientes y Documentos Digitales</h3>
+                <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="p-4 text-center text-slate-400 col-span-full">Cargando expediente...</div>
                 </div>
             </div>
+
         </main>
     </div>
 
-    <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
-    <div id="student-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 class="text-base font-bold text-slate-900" id="student-modal-title">Registrar Nuevo Alumno</h3>
-                <button onclick="closeModal('student-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- MODAL REGISTRO ALUMNO -->
+    <div id="student-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-100 max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="student-modal-title" class="font-bold text-slate-800">Registrar Alumno</h3>
+                <button onclick="closeStudentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
-            <form id="student-form" onsubmit="handleStudentSubmit(event)" class="space-y-4">
+            <form id="student-form" onsubmit="event.preventDefault(); saveStudent();" class="p-6 space-y-4 overflow-y-auto flex-1">
                 <input type="hidden" id="student-id">
-
-                <!-- FOTO DE PERFIL DEL ALUMNO -->
-                <div class="flex items-center space-x-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <div class="w-14 h-14 rounded-full bg-slate-200 border-2 border-brand-500 flex items-center justify-center overflow-hidden shrink-0">
-                        <i class="fa-solid fa-user text-xl text-slate-400" id="icon-foto-default"></i>
-                        <img id="preview-foto" class="w-full h-full object-cover hidden" alt="Foto perfil">
-                    </div>
-                    <div class="flex-1">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Fotografía del Alumno</label>
-                        <input type="file" id="student-foto" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
-                    </div>
-                </div>
-
-                <!-- NOMBRES Y APELLIDOS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombres *</label>
-                        <input type="text" id="student-nombres" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombres</label>
+                        <input type="text" id="student-nombres" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Apellidos *</label>
-                        <input type="text" id="student-apellidos" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <!-- DOCUMENTO / CÉDULA Y TELÉFONO -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Documento / Cédula / DUI</label>
-                        <input type="text" id="student-dni" placeholder="00000000-0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Apellidos</label>
+                        <input type="text" id="student-apellidos" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Teléfono</label>
-                        <input type="text" id="student-phone" placeholder="7000-0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <!-- EDAD, NIVEL Y MAESTRO RESPONSABLE -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Edad</label>
-                        <input type="number" id="student-age" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">DUI / Identificación</label>
+                        <input type="text" id="student-identificacion" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nivel Alfabetización</label>
-                        <select id="student-level" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                            <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
-                            <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
-                            <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
-                            <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
-                        </select>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono</label>
+                        <input type="text" id="student-telefono" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Maestro Responsable *</label>
-                        <select id="student-maestro" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                            <option value="">Cargando maestros...</option>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Edad</label>
+                        <input type="number" id="student-edad" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nivel</label>
+                        <select id="student-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                            <option value="Nivel 1">Nivel 1</option>
+                            <option value="Nivel 2">Nivel 2</option>
+                            <option value="Nivel 3">Nivel 3</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- ADJUNTAR DOCUMENTOS PERSONALES -->
-                <div class="border-t border-slate-200 pt-3">
-                    <h4 class="text-xs font-bold text-slate-800 mb-2 flex items-center space-x-1">
-                        <i class="fa-solid fa-paperclip text-brand-600"></i>
-                        <span>Adjuntar Documentos Personales</span>
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <label class="block font-semibold text-slate-700 mb-1">DUI / Cédula</label>
-                            <input type="file" id="file-dui" accept="image/*,.pdf" class="w-full text-slate-500 text-[10px]">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Maestro Responsable</label>
+                    <input type="text" id="student-maestro" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                </div>
+
+                <div class="border-t border-slate-200 pt-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase">Documentos Adjuntos</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Foto Alumno</label>
+                            <input type="file" id="file-foto" class="text-xs w-full">
                         </div>
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <label class="block font-semibold text-slate-700 mb-1">Partida Nacimiento</label>
-                            <input type="file" id="file-partida" accept="image/*,.pdf" class="w-full text-slate-500 text-[10px]">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">DUI Adjunto</label>
+                            <input type="file" id="file-dui" class="text-xs w-full">
                         </div>
-                        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <label class="block font-semibold text-slate-700 mb-1">Certificados / Otros</label>
-                            <input type="file" id="file-certificado" accept="image/*,.pdf" class="w-full text-slate-500 text-[10px]">
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Partida Nacimiento</label>
+                            <input type="file" id="file-partida" class="text-xs w-full">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Certificado</label>
+                            <input type="file" id="file-certificado" class="text-xs w-full">
                         </div>
                     </div>
                 </div>
 
-                <!-- BOTONES -->
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('student-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs">Cancelar</button>
-                    <button type="submit" id="btn-submit-student" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs shadow-sm flex items-center space-x-2">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Guardar Alumno</span>
-                    </button>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeStudentModal()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar Alumno</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: REGISTRAR / EDITAR MAESTRO -->
-    <div id="teacher-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 class="text-base font-bold text-slate-900" id="teacher-modal-title">Registrar Nuevo Maestro</h3>
-                <button onclick="closeModal('teacher-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- MODAL REGISTRO MAESTRO Y ACCESO -->
+    <div id="teacher-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 id="teacher-modal-title" class="font-bold text-slate-800">Registrar Maestro</h3>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            
-            <form id="teacher-form" onsubmit="handleTeacherSubmit(event)" class="space-y-4">
+            <form id="teacher-form" onsubmit="event.preventDefault(); saveTeacher();" class="p-6 space-y-4">
                 <input type="hidden" id="teacher-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="teacher-nombre" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                </div>
 
-                <!-- FOTO DE PERFIL DEL MAESTRO -->
-                <div class="flex items-center space-x-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <div class="w-14 h-14 rounded-full bg-slate-200 border-2 border-brand-500 flex items-center justify-center overflow-hidden shrink-0">
-                        <i class="fa-solid fa-chalkboard-user text-xl text-slate-400" id="icon-teacher-foto-default"></i>
-                        <img id="preview-teacher-foto" class="w-full h-full object-cover hidden" alt="Foto Maestro">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Correo Electrónico (Login)</label>
+                        <input type="email" id="teacher-email" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
-                    <div class="flex-1">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Fotografía del Maestro</label>
-                        <input type="file" id="teacher-foto" accept="image/*" onchange="previsualizarFotoMaestro(event)" class="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Contraseña</label>
+                        <input type="password" id="teacher-password" placeholder="Mínimo 6 caracteres" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                        <span class="text-[10px] text-slate-400">Requerido para crear nuevo acceso.</span>
                     </div>
                 </div>
 
-                <!-- NOMBRE Y DUI -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre Completo *</label>
-                        <input type="text" id="teacher-nombre" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono</label>
+                        <input type="text" id="teacher-telefono" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">DUI *</label>
-                        <input type="text" id="teacher-dui" placeholder="00000000-0" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">DUI</label>
+                        <input type="text" id="teacher-dui" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                     </div>
                 </div>
 
-                <!-- TELÉFONO Y CORREO -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Teléfono</label>
-                        <input type="text" id="teacher-phone" placeholder="7000-0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico</label>
-                        <input type="email" id="teacher-email" placeholder="maestro@correo.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <!-- NIVEL Y ROL EN EL NIVEL -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nivel Asignado</label>
-                        <select id="teacher-nivel" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                            <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
-                            <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
-                            <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
-                            <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nivel Asignado</label>
+                        <select id="teacher-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
+                            <option value="Nivel 1">Nivel 1</option>
+                            <option value="Nivel 2">Nivel 2</option>
+                            <option value="Nivel 3">Nivel 3</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Rol en el Nivel *</label>
-                        <select id="teacher-rol" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Rol de Nivel</label>
+                        <select id="teacher-rol-nivel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm">
                             <option value="Líder de nivel">Líder de nivel</option>
                             <option value="Sublíder">Sublíder</option>
                             <option value="Colaborador">Colaborador</option>
@@ -548,706 +439,494 @@
                     </div>
                 </div>
 
-                <!-- ADJUNTO DUI -->
-                <div class="border-t border-slate-200 pt-3">
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Copia de DUI (Imagen o PDF)</label>
-                    <input type="file" id="teacher-dui-file" accept="image/*,.pdf" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
-                </div>
-
-                <!-- BOTONES -->
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('teacher-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs">Cancelar</button>
-                    <button type="submit" id="btn-submit-teacher" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs shadow-sm flex items-center space-x-2">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Guardar Maestro</span>
-                    </button>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeTeacherModal()" class="px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold">Guardar y Dar Acceso</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: REGISTRAR NOTA -->
-    <div id="grade-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 class="text-base font-bold text-slate-900">Registrar Calificación</h3>
-                <button onclick="closeModal('grade-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form id="grade-form" onsubmit="handleGradeSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Alumno *</label>
-                    <select id="grade-student-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Módulo *</label>
-                    <select id="grade-period" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
-                        <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
-                        <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre de Evaluación *</label>
-                    <input type="text" id="grade-title" required placeholder="Ej. Lectura de sílabas" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Calificación (0 - 10) *</label>
-                        <input type="number" id="grade-score" step="0.1" min="0" max="10" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha</label>
-                        <input type="date" id="grade-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('grade-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs">Cancelar</button>
-                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs shadow-sm">Guardar Nota</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
-
-    <!-- LÓGICA INTEGRADORA CON SUPABASE Y AUTENTICACIÓN -->
+    <!-- LOGICA JAVASCRIPT -->
     <script>
+        // 🚨🚨🚨 CLAVES CONFIGURADAS DE SUPABASE 🚨🚨🚨
         const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB";
+        const SUPABASE_ANON_KEY = "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB";
+        const SUPABASE_SERVICE_ROLE_KEY = "sb_secret_F3WLOtuATQz7yMsXYxeoBw_9Kra7YnI"; 
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        let state = { students: [], teachers: [], countAsistencias: 0 };
-
-        window.onload = async function() {
-            document.getElementById('attendance-date').valueAsDate = new Date();
-            
-            // Verificar si hay usuario autenticado al abrir la página
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            gestionarEstadoSesion(session);
-
-            // Escuchar cambios de sesión en vivo
-            supabaseClient.auth.onAuthStateChange((_event, session) => {
-                gestionarEstadoSesion(session);
-            });
-        };
-
-        function gestionarEstadoSesion(session) {
-            const loginContainer = document.getElementById('login-container');
-            const appContainer = document.getElementById('app-container');
-            const userBadge = document.getElementById('user-email-badge');
-
-            if (session) {
-                loginContainer.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-                if (userBadge) {
-                    userBadge.textContent = session.user.email;
-                    userBadge.classList.remove('hidden');
-                }
-                cargarDatos();
-            } else {
-                loginContainer.classList.remove('hidden');
-                appContainer.classList.add('hidden');
+        // Cliente normal
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Cliente admin
+        const supabaseAdmin = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
             }
-        }
+        });
 
-        async function handleLogin(e) {
-            e.preventDefault();
+        let currentUser = null;
+        let userProfile = null;
+        let globalAlumnos = [];
+        let globalMaestros = [];
+
+        // INICIALIZACIÓN
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('attendance-date').valueAsDate = new Date();
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                showAppScreen();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        // LOGIN / LOGOUT
+        async function handleLogin() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const errorDiv = document.getElementById('login-error');
-            const btn = document.getElementById('btn-login');
-
             errorDiv.classList.add('hidden');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Accediendo...`;
 
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
             if (error) {
-                errorDiv.textContent = 'Error al ingresar: Credenciales incorrectas o usuario no registrado.';
+                errorDiv.innerText = "Credenciales incorrectas: " + error.message;
                 errorDiv.classList.remove('hidden');
             } else {
-                showToast('¡Bienvenido al sistema!');
+                currentUser = data.user;
+                await loadUserProfile();
+                showAppScreen();
             }
-
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>Iniciar Sesión</span>`;
         }
 
         async function handleLogout() {
-            if (confirm('¿Desea cerrar la sesión actual?')) {
-                await supabaseClient.auth.signOut();
-                showToast('Sesión cerrada correctamente');
-            }
+            await supabaseClient.auth.signOut();
+            location.reload();
         }
 
-        async function cargarDatos() {
-            await cargarMaestros();
-            await cargarAlumnos();
-            await cargarAsistenciasCount();
-            renderDashboard();
+        async function loadUserProfile() {
+            const { data } = await supabaseClient
+                .from('maestros')
+                .select('*')
+                .eq('email', currentUser.email)
+                .maybeSingle();
+
+            userProfile = data || { nombre: currentUser.email, rol_nivel: 'Líder', rol: 'admin' };
+            document.getElementById('user-display-name').innerText = userProfile.nombre;
+            document.getElementById('user-display-role').innerText = userProfile.rol_nivel || 'Maestro';
         }
 
-        async function cargarMaestros() {
-            const { data, error } = await supabaseClient.from('maestros').select('*').order('nombre', { ascending: true });
-            if (!error && data) {
-                state.teachers = data;
-                renderTeachersTable();
-                poblarSelectMaestros();
-            }
+        function showLoginScreen() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
         }
 
-        function poblarSelectMaestros() {
-            const select = document.getElementById('student-maestro');
-            if (!select) return;
-            
-            if (state.teachers.length === 0) {
-                select.innerHTML = '<option value="">No hay maestros registrados</option>';
-                return;
-            }
-
-            select.innerHTML = '<option value="">-- Seleccionar Maestro --</option>' + 
-                state.teachers.map(m => `<option value="${m.nombre}">${m.nombre}</option>`).join('');
+        function showAppScreen() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            loadAllData();
         }
 
-        async function cargarAlumnos() {
-            const { data, error } = await supabaseClient.from('alumnos').select('*').order('id', { ascending: false });
-            if (!error && data) {
-                state.students = data;
-                renderStudentsTable();
-                renderDocumentsGrid();
-                updateStudentDropdowns();
-            }
-        }
-
-        async function cargarAsistenciasCount() {
-            const { count, error } = await supabaseClient.from('asistencia').select('*', { count: 'exact', head: true });
-            if (!error && count !== null) {
-                state.countAsistencias = count;
-            }
-        }
-
+        // TABS NAVIGATION
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('bg-white', 'text-brand-700', 'shadow-sm');
-                el.classList.add('text-slate-600', 'hover:text-slate-900');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-100', 'text-emerald-700');
+                btn.classList.add('text-slate-600');
             });
 
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            const activeBtn = document.getElementById('nav-' + tabId);
-            activeBtn.classList.remove('text-slate-600', 'hover:text-slate-900');
-            activeBtn.classList.add('bg-white', 'text-brand-700', 'shadow-sm');
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-emerald-100', 'text-emerald-700');
+            activeBtn.classList.remove('text-slate-600');
 
-            if (tabId === 'dashboard') renderDashboard();
-            if (tabId === 'students') renderStudentsTable();
-            if (tabId === 'teachers') renderTeachersTable();
-            if (tabId === 'attendance') loadAttendanceForDate();
-            if (tabId === 'documents') renderDocumentsGrid();
+            if (tabId === 'tab-asistencia') loadAttendanceList();
+            if (tabId === 'tab-calificaciones') loadGradesList();
+            if (tabId === 'tab-documentos') renderDocuments();
         }
 
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-semibold text-white flex items-center space-x-2 ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`;
-            toast.innerHTML = `<span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        // CARGA DE DATOS
+        async function loadAllData() {
+            await Promise.all([fetchAlumnos(), fetchMaestros()]);
+            updateDashboardStats();
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+        async function fetchAlumnos() {
+            const { data } = await supabaseClient.from('alumnos').select('*').order('created_at', { ascending: false });
+            globalAlumnos = data || [];
+            renderAlumnosTable();
         }
 
-        function previsualizarFoto(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview-foto').src = e.target.result;
-                    document.getElementById('preview-foto').classList.remove('hidden');
-                    document.getElementById('icon-foto-default').classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
+        async function fetchMaestros() {
+            const { data } = await supabaseClient.from('maestros').select('*');
+            globalMaestros = data || [];
+            renderMaestrosTable();
         }
 
-        function previsualizarFotoMaestro(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('preview-teacher-foto').src = e.target.result;
-                    document.getElementById('preview-teacher-foto').classList.remove('hidden');
-                    document.getElementById('icon-teacher-foto-default').classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        async function subirArchivoSupabase(inputFileElement, carpeta) {
-            const file = inputFileElement.files[0];
-            if (!file) return null;
-
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${carpeta}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-            const { data, error } = await supabaseClient.storage
-                .from('documentos_alumnos')
-                .upload(fileName, file);
-
-            if (error) {
-                console.error('Error al subir archivo:', error);
-                return null;
-            }
-
-            const { data: publicUrlData } = supabaseClient.storage
-                .from('documentos_alumnos')
-                .getPublicUrl(fileName);
-
-            return publicUrlData.publicUrl;
-        }
-
-        function renderDashboard() {
-            document.getElementById('stat-total-students').textContent = state.students.length;
-            document.getElementById('stat-avg-attendance').textContent = state.countAsistencias;
+        function updateDashboardStats() {
+            document.getElementById('stat-alumnos').innerText = globalAlumnos.length;
+            document.getElementById('stat-maestros').innerText = globalMaestros.length;
             
-            const nivel0Count = state.students.filter(s => s.nivel && s.nivel.includes('Nivel 0')).length;
-            document.getElementById('stat-nivel0').textContent = nivel0Count;
-
-            const docsCount = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url).length;
-            document.getElementById('stat-total-docs').textContent = docsCount;
-
-            const tbody = document.getElementById('dashboard-students-list');
-            tbody.innerHTML = '';
-            const recent = state.students.slice(0, 5);
-            if (recent.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">No hay alumnos registrados.</td></tr>`;
-                return;
-            }
-            recent.forEach(s => {
-                const avatar = s.foto_url 
-                    ? `<img src="${s.foto_url}" class="w-7 h-7 rounded-full object-cover">`
-                    : `<div class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs">${s.nombres ? s.nombres[0] : 'A'}</div>`;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80">
-                        <td class="py-3 font-medium text-slate-900 flex items-center space-x-2">
-                            ${avatar}
-                            <span>${s.nombres} ${s.apellidos}</span>
-                        </td>
-                        <td class="py-3 text-slate-500">${s.maestro_responsable || 'No asignado'}</td>
-                        <td class="py-3"><span class="px-2.5 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
-                        <td class="py-3 text-right">
-                            <button onclick="switchTab('students')" class="text-brand-600 hover:text-brand-800 text-xs font-semibold">Ver <i class="fa-solid fa-arrow-right ml-1"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
+            const recentBody = document.getElementById('recent-students-list');
+            recentBody.innerHTML = globalAlumnos.slice(0, 5).map(a => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${a.nivel || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${a.maestro_responsable || 'Sin asignar'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md">${a.estado || 'Activo'}</span></td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin alumnos</td></tr>';
         }
 
-        /* ----- MÓDULO DE ALUMNOS ----- */
-        function renderStudentsTable() {
-            const search = document.getElementById('student-search').value.toLowerCase();
-            const tbody = document.getElementById('students-table-body');
-            tbody.innerHTML = '';
-
-            const filtered = state.students.filter(s => 
-                `${s.nombres} ${s.apellidos}`.toLowerCase().includes(search) || 
-                (s.identificacion && s.identificacion.toLowerCase().includes(search)) ||
-                (s.maestro_responsable && s.maestro_responsable.toLowerCase().includes(search))
-            );
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">No se encontraron alumnos.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach(s => {
-                const avatar = s.foto_url 
-                    ? `<img src="${s.foto_url}" class="w-9 h-9 rounded-full object-cover border border-slate-200">`
-                    : `<div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs border border-brand-200">${s.nombres ? s.nombres[0] : 'A'}</div>`;
-
-                const docsIcons = `
-                    <div class="flex justify-center space-x-2 text-sm">
-                        ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" title="DUI" class="text-indigo-600 hover:text-indigo-800"><i class="fa-id-card"></i></a>` : ''}
-                        ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" title="Partida" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-file-contract"></i></a>` : ''}
-                        ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" title="Certificado" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-award"></i></a>` : ''}
-                        ${!s.dui_url && !s.partida_url && !s.certificado_url ? `<span class="text-xs text-slate-300">-</span>` : ''}
-                    </div>
-                `;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80 transition-all">
-                        <td class="py-3 px-4 flex items-center space-x-3">
-                            ${avatar}
-                            <div>
-                                <div class="font-bold text-slate-900">${s.nombres} ${s.apellidos}</div>
-                                <div class="text-xs text-slate-400">${s.edad ? s.edad + ' años' : 'Edad S/D'}</div>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4">
-                            <div class="text-slate-800 font-medium text-xs">${s.identificacion || 'Sin Documento'}</div>
-                            <div class="text-xs text-slate-400">${s.telefono || 'Sin Teléfono'}</div>
-                        </td>
-                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${s.maestro_responsable || 'No asignado'}</td>
-                        <td class="py-3 px-4"><span class="px-2.5 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
-                        <td class="py-3 px-4 text-center">${docsIcons}</td>
-                        <td class="py-3 px-4 text-right space-x-1">
-                            <button onclick="editStudent(${s.id})" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteStudent(${s.id})" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
+        // MAESTROS CRUD Y REGISTRO DE USUARIOS
+        function renderMaestrosTable() {
+            const tbody = document.getElementById('maestros-list-body');
+            tbody.innerHTML = globalMaestros.map(m => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${m.nombre}</td>
+                    <td class="p-3 text-slate-500">${m.email || 'N/A'}</td>
+                    <td class="p-3 text-slate-500">${m.telefono || 'N/A'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${m.nivel_id || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${m.rol_nivel || 'Colaborador'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editTeacher('${m.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTeacher('${m.id}')" class="text-red-600 hover:text-red-800 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
         }
 
-        function openAddStudentModal() {
-            document.getElementById('student-form').reset();
-            document.getElementById('student-id').value = '';
-            document.getElementById('student-foto').value = '';
-            document.getElementById('preview-foto').src = '';
-            document.getElementById('preview-foto').classList.add('hidden');
-            document.getElementById('icon-foto-default').classList.remove('hidden');
-            poblarSelectMaestros();
-            document.getElementById('student-modal-title').textContent = 'Registrar Nuevo Alumno';
-            document.getElementById('student-modal').classList.remove('hidden');
-        }
-
-        function editStudent(id) {
-            const student = state.students.find(s => s.id === id);
-            if (!student) return;
-
-            document.getElementById('student-id').value = student.id;
-            document.getElementById('student-nombres').value = student.nombres || '';
-            document.getElementById('student-apellidos').value = student.apellidos || '';
-            document.getElementById('student-dni').value = student.identificacion || student.documento || '';
-            document.getElementById('student-phone').value = student.telefono || '';
-            document.getElementById('student-age').value = student.edad || '';
-            document.getElementById('student-level').value = student.nivel || 'Inicial (Nivel 0)';
-            
-            poblarSelectMaestros();
-            document.getElementById('student-maestro').value = student.maestro_responsable || '';
-
-            document.getElementById('student-foto').value = '';
-
-            if (student.foto_url) {
-                document.getElementById('preview-foto').src = student.foto_url;
-                document.getElementById('preview-foto').classList.remove('hidden');
-                document.getElementById('icon-foto-default').classList.add('hidden');
-            } else {
-                document.getElementById('preview-foto').src = '';
-                document.getElementById('preview-foto').classList.add('hidden');
-                document.getElementById('icon-foto-default').classList.remove('hidden');
-            }
-
-            document.getElementById('student-modal-title').textContent = 'Modificar Datos del Alumno';
-            document.getElementById('student-modal').classList.remove('hidden');
-        }
-
-        async function handleStudentSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-student');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
-
-            try {
-                const idInput = document.getElementById('student-id').value;
-                const studentExistente = idInput ? state.students.find(s => s.id === parseInt(idInput, 10)) : null;
-
-                const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('student-foto'), 'fotos');
-                const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('file-dui'), 'duis');
-                const partidaUrlNueva = await subirArchivoSupabase(document.getElementById('file-partida'), 'partidas');
-                const certificadoUrlNuevo = await subirArchivoSupabase(document.getElementById('file-certificado'), 'certificados');
-
-                const payload = {
-                    nombres: document.getElementById('student-nombres').value,
-                    apellidos: document.getElementById('student-apellidos').value,
-                    identificacion: document.getElementById('student-dni').value,
-                    telefono: document.getElementById('student-phone').value,
-                    edad: document.getElementById('student-age').value ? parseInt(document.getElementById('student-age').value, 10) : null,
-                    nivel: document.getElementById('student-level').value,
-                    maestro_responsable: document.getElementById('student-maestro').value,
-                    foto_url: fotoUrlNueva || (studentExistente ? studentExistente.foto_url : null),
-                    dui_url: duiUrlNuevo || (studentExistente ? studentExistente.dui_url : null),
-                    partida_url: partidaUrlNueva || (studentExistente ? studentExistente.partida_url : null),
-                    certificado_url: certificadoUrlNuevo || (studentExistente ? studentExistente.certificado_url : null)
-                };
-
-                let error;
-                if (idInput) {
-                    const res = await supabaseClient.from('alumnos').update(payload).eq('id', parseInt(idInput, 10));
-                    error = res.error;
-                } else {
-                    const res = await supabaseClient.from('alumnos').insert([payload]);
-                    error = res.error;
-                }
-
-                if (error) {
-                    showToast('Error al guardar: ' + error.message, 'error');
-                } else {
-                    showToast(idInput ? 'Alumno actualizado con éxito' : 'Alumno y documentos guardados con éxito');
-                    closeModal('student-modal');
-                    await cargarAlumnos();
-                }
-            } catch (err) {
-                showToast('Error inesperado al subir archivos', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Alumno`;
-            }
-        }
-
-        async function deleteStudent(id) {
-            if (confirm('¿Desea eliminar este alumno de la base de datos?')) {
-                const { error } = await supabaseClient.from('alumnos').delete().eq('id', id);
-                if (error) showToast('Error al eliminar', 'error');
-                else {
-                    showToast('Alumno eliminado');
-                    cargarAlumnos();
-                }
-            }
-        }
-
-        /* ----- MÓDULO DE MAESTROS ----- */
-        function renderTeachersTable() {
-            const search = (document.getElementById('teacher-search').value || '').toLowerCase();
-            const tbody = document.getElementById('teachers-table-body');
-            tbody.innerHTML = '';
-
-            const filtered = state.teachers.filter(m => 
-                (m.nombre && m.nombre.toLowerCase().includes(search)) || 
-                (m.dui && m.dui.toLowerCase().includes(search))
-            );
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">No hay maestros registrados.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach(m => {
-                const avatar = m.foto_url 
-                    ? `<img src="${m.foto_url}" class="w-9 h-9 rounded-full object-cover border border-slate-200">`
-                    : `<div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs border border-brand-200">${m.nombre ? m.nombre[0] : 'M'}</div>`;
-
-                const rolColor = m.rol_nivel === 'Líder de nivel' ? 'bg-purple-100 text-purple-800' :
-                                 m.rol_nivel === 'Sublíder' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700';
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80 transition-all">
-                        <td class="py-3 px-4 flex items-center space-x-3">
-                            ${avatar}
-                            <div>
-                                <div class="font-bold text-slate-900">${m.nombre}</div>
-                                <div class="text-xs text-slate-400">${m.email || 'Sin Correo'}</div>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4">
-                            <div class="text-slate-800 font-medium text-xs">${m.dui || 'Sin DUI'}</div>
-                            <div class="text-xs text-slate-400">${m.telefono || 'Sin Teléfono'}</div>
-                        </td>
-                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${m.nivel_id || 'Sin Asignar'}</td>
-                        <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 ${rolColor} rounded-lg text-xs font-semibold">${m.rol_nivel || 'Colaborador'}</span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            ${m.dui_adjunto_url ? `<a href="${m.dui_adjunto_url}" target="_blank" class="text-brand-600 hover:text-brand-800 text-xs font-semibold"><i class="fa-solid fa-file-pdf mr-1"></i>Ver DUI</a>` : '<span class="text-slate-300 text-xs">-</span>'}
-                        </td>
-                        <td class="py-3 px-4 text-right space-x-1">
-                            <button onclick="editTeacher('${m.id}')" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteTeacher('${m.id}')" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function openAddTeacherModal() {
+        function openTeacherModal() {
             document.getElementById('teacher-form').reset();
             document.getElementById('teacher-id').value = '';
-            document.getElementById('teacher-foto').value = '';
-            document.getElementById('preview-teacher-foto').src = '';
-            document.getElementById('preview-teacher-foto').classList.add('hidden');
-            document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
-            document.getElementById('teacher-modal-title').textContent = 'Registrar Nuevo Maestro';
+            document.getElementById('teacher-modal-title').innerText = 'Registrar Maestro / Crear Acceso';
             document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacher-modal').classList.add('hidden');
+        }
+
+        async function saveTeacher() {
+            const id = document.getElementById('teacher-id').value;
+            const email = document.getElementById('teacher-email').value;
+            const password = document.getElementById('teacher-password').value;
+            const nombre = document.getElementById('teacher-nombre').value;
+            const telefono = document.getElementById('teacher-telefono').value;
+            const dui = document.getElementById('teacher-dui').value;
+            const nivel_id = document.getElementById('teacher-nivel').value;
+            const rol_nivel = document.getElementById('teacher-rol-nivel').value;
+
+            let authUserId = id;
+
+            if (!id && password) {
+                const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+                    email: email,
+                    password: password,
+                    email_confirm: true
+                });
+
+                if (authError) {
+                    alert("Error al crear usuario de acceso: " + authError.message);
+                    return;
+                }
+                if (authData?.user) {
+                    authUserId = authData.user.id;
+                }
+            }
+
+            const teacherData = {
+                nombre,
+                email,
+                telefono,
+                dui,
+                nivel_id,
+                rol_nivel,
+                estado: 'Activo'
+            };
+
+            if (authUserId) {
+                teacherData.id = authUserId;
+            }
+
+            const { error } = await supabaseClient.from('maestros').upsert(teacherData);
+            if (error) {
+                alert("Error al guardar en la tabla maestros: " + error.message);
+            } else {
+                alert("Maestro guardado con éxito y su acceso ha sido creado.");
+                closeTeacherModal();
+                fetchMaestros();
+            }
         }
 
         function editTeacher(id) {
-            const m = state.teachers.find(item => item.id == id);
+            const m = globalMaestros.find(item => item.id === id);
             if (!m) return;
-
             document.getElementById('teacher-id').value = m.id;
             document.getElementById('teacher-nombre').value = m.nombre || '';
-            document.getElementById('teacher-dui').value = m.dui || '';
-            document.getElementById('teacher-phone').value = m.telefono || '';
             document.getElementById('teacher-email').value = m.email || '';
-            document.getElementById('teacher-nivel').value = m.nivel_id || 'Inicial (Nivel 0)';
-            document.getElementById('teacher-rol').value = m.rol_nivel || 'Colaborador';
-
-            if (m.foto_url) {
-                document.getElementById('preview-teacher-foto').src = m.foto_url;
-                document.getElementById('preview-teacher-foto').classList.remove('hidden');
-                document.getElementById('icon-teacher-foto-default').classList.add('hidden');
-            } else {
-                document.getElementById('preview-teacher-foto').src = '';
-                document.getElementById('preview-teacher-foto').classList.add('hidden');
-                document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
-            }
-
-            document.getElementById('teacher-modal-title').textContent = 'Modificar Datos del Maestro';
+            document.getElementById('teacher-telefono').value = m.telefono || '';
+            document.getElementById('teacher-dui').value = m.dui || '';
+            document.getElementById('teacher-nivel').value = m.nivel_id || 'Nivel 1';
+            document.getElementById('teacher-rol-nivel').value = m.rol_nivel || 'Líder de nivel';
+            document.getElementById('teacher-modal-title').innerText = 'Editar Maestro';
             document.getElementById('teacher-modal').classList.remove('hidden');
         }
 
-        async function handleTeacherSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-teacher');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
-
-            try {
-                const idInput = document.getElementById('teacher-id').value;
-                const mExistente = idInput ? state.teachers.find(item => item.id == idInput) : null;
-
-                const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'maestros_fotos');
-                const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'maestros_duis');
-
-                const payload = {
-                    nombre: document.getElementById('teacher-nombre').value,
-                    dui: document.getElementById('teacher-dui').value,
-                    telefono: document.getElementById('teacher-phone').value,
-                    email: document.getElementById('teacher-email').value,
-                    nivel_id: document.getElementById('teacher-nivel').value,
-                    rol_nivel: document.getElementById('teacher-rol').value,
-                    foto_url: fotoUrlNueva || (mExistente ? mExistente.foto_url : null),
-                    dui_adjunto_url: duiUrlNuevo || (mExistente ? mExistente.dui_adjunto_url : null)
-                };
-
-                let error;
-                if (idInput) {
-                    const res = await supabaseClient.from('maestros').update(payload).eq('id', idInput);
-                    error = res.error;
-                } else {
-                    const res = await supabaseClient.from('maestros').insert([payload]);
-                    error = res.error;
-                }
-
-                if (error) {
-                    showToast('Error al guardar maestro: ' + error.message, 'error');
-                } else {
-                    showToast(idInput ? 'Maestro actualizado con éxito' : 'Maestro registrado con éxito');
-                    closeModal('teacher-modal');
-                    await cargarMaestros();
-                }
-            } catch (err) {
-                showToast('Error inesperado al guardar maestro', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Maestro`;
-            }
-        }
-
         async function deleteTeacher(id) {
-            if (confirm('¿Desea eliminar este maestro de la base de datos?')) {
-                const { error } = await supabaseClient.from('maestros').delete().eq('id', id);
-                if (error) showToast('Error al eliminar', 'error');
-                else {
-                    showToast('Maestro eliminado');
-                    cargarMaestros();
+            if (confirm("¿Estás seguro de que deseas eliminar este maestro? Esto también removerá su acceso al sistema.")) {
+                // 1. Eliminar maestro de la tabla de la base de datos
+                const { error: dbError } = await supabaseClient.from('maestros').delete().eq('id', id);
+                if (dbError) {
+                    alert("Error al eliminar el maestro: " + dbError.message);
+                    return;
                 }
+
+                // 2. Eliminar el usuario de autenticación en Supabase
+                try {
+                    await supabaseAdmin.auth.admin.deleteUser(id);
+                } catch (e) {
+                    console.log("Aviso: No se pudo eliminar de Auth o era un registro manual:", e);
+                }
+
+                alert("Maestro eliminado con éxito.");
+                fetchMaestros();
             }
         }
 
-        /* ----- OTROS MÓDULOS ----- */
-        async function loadAttendanceForDate() {
-            const tbody = document.getElementById('attendance-table-body');
-            tbody.innerHTML = '';
+        // ALUMNOS CRUD
+        function renderAlumnosTable() {
+            const search = document.getElementById('search-student').value.toLowerCase();
+            const filtered = globalAlumnos.filter(a => 
+                (`${a.nombres} ${a.apellidos}`).toLowerCase().includes(search) || 
+                (a.identificacion || '').toLowerCase().includes(search)
+            );
 
-            if (state.students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">No hay alumnos.</td></tr>`;
-                return;
+            const tbody = document.getElementById('alumnos-list-body');
+            tbody.innerHTML = filtered.map(a => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                    <td class="p-3 text-slate-500">${a.identificacion || 'N/A'}</td>
+                    <td class="p-3 text-slate-500">${a.edad || 'N/A'}</td>
+                    <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${a.nivel || 'N/A'}</span></td>
+                    <td class="p-3 text-slate-500">${a.maestro_responsable || 'Sin asignar'}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editStudent(${a.id})" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteStudent(${a.id})" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin registros de alumnos</td></tr>';
+        }
+
+        function openStudentModal() {
+            document.getElementById('student-form').reset();
+            document.getElementById('student-id').value = '';
+            document.getElementById('student-modal-title').innerText = 'Registrar Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('student-modal').classList.add('hidden');
+        }
+
+        async function uploadFile(fileInputId, folder) {
+            const input = document.getElementById(fileInputId);
+            if (!input.files || input.files.length === 0) return null;
+            const file = input.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+            const { error } = await supabaseClient.storage.from('documentos_alumnos').upload(fileName, file);
+            if (error) {
+                console.error("Error al subir archivo:", error.message);
+                return null;
             }
 
-            state.students.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80">
-                        <td class="py-3 px-4 font-bold text-slate-900">${s.nombres} ${s.apellidos}</td>
-                        <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'Sin maestro'}</td>
-                        <td class="py-3 px-4"><span class="px-2 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="marcarAsistencia(${s.id}, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Presente</button>
-                            <button onclick="marcarAsistencia(${s.id}, false)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition ml-2">Ausente</button>
+            const { data } = supabaseClient.storage.from('documentos_alumnos').getPublicUrl(fileName);
+            return data.publicUrl;
+        }
+
+        async function saveStudent() {
+            const id = document.getElementById('student-id').value;
+            const nombres = document.getElementById('student-nombres').value;
+            const apellidos = document.getElementById('student-apellidos').value;
+            const identificacion = document.getElementById('student-identificacion').value;
+            const telefono = document.getElementById('student-telefono').value;
+            const edad = parseInt(document.getElementById('student-edad').value) || null;
+            const nivel = document.getElementById('student-nivel').value;
+            const maestro_responsable = document.getElementById('student-maestro').value;
+
+            const foto_url = await uploadFile('file-foto', 'fotos');
+            const dui_url = await uploadFile('file-dui', 'duis');
+            const partida_url = await uploadFile('file-partida', 'partidas');
+            const certificado_url = await uploadFile('file-certificado', 'certificados');
+
+            const payload = {
+                nombres, apellidos, identificacion, telefono, edad, nivel, maestro_responsable, estado: 'Activo'
+            };
+
+            if (foto_url) payload.foto_url = foto_url;
+            if (dui_url) payload.dui_url = dui_url;
+            if (partida_url) payload.partida_url = partida_url;
+            if (certificado_url) payload.certificado_url = certificado_url;
+
+            let query = supabaseClient.from('alumnos');
+            if (id) {
+                await query.update(payload).eq('id', id);
+            } else {
+                await query.insert([payload]);
+            }
+
+            closeStudentModal();
+            fetchAlumnos();
+        }
+
+        function editStudent(id) {
+            const a = globalAlumnos.find(item => item.id === id);
+            if (!a) return;
+            document.getElementById('student-id').value = a.id;
+            document.getElementById('student-nombres').value = a.nombres || '';
+            document.getElementById('student-apellidos').value = a.apellidos || '';
+            document.getElementById('student-identificacion').value = a.identificacion || '';
+            document.getElementById('student-telefono').value = a.telefono || '';
+            document.getElementById('student-edad').value = a.edad || '';
+            document.getElementById('student-nivel').value = a.nivel || 'Nivel 1';
+            document.getElementById('student-maestro').value = a.maestro_responsable || '';
+            document.getElementById('student-modal-title').innerText = 'Editar Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        async function deleteStudent(id) {
+            if (confirm("¿Estás seguro de eliminar este alumno?")) {
+                await supabaseClient.from('alumnos').delete().eq('id', id);
+                fetchAlumnos();
+            }
+        }
+
+        // ASISTENCIA
+        async function loadAttendanceList() {
+            const fecha = document.getElementById('attendance-date').value;
+            const { data: asistencias } = await supabaseClient.from('asistencia').select('*').eq('fecha', fecha);
+
+            const mapAsistencia = {};
+            (asistencias || []).forEach(a => {
+                mapAsistencia[a.alumno_id] = a;
+            });
+
+            const tbody = document.getElementById('attendance-list-body');
+            tbody.innerHTML = globalAlumnos.map(a => {
+                const reg = mapAsistencia[a.id] || {};
+                const presente = reg.presente !== undefined ? reg.presente : true;
+                const obs = reg.observacion || '';
+                return `
+                    <tr class="border-b border-slate-100" data-alumno-id="${a.id}">
+                        <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                        <td class="p-3 text-slate-500">${a.nivel}</td>
+                        <td class="p-3 text-center">
+                            <input type="checkbox" class="attendance-check h-5 w-5 text-emerald-600 rounded" ${presente ? 'checked' : ''}>
+                        </td>
+                        <td class="p-3">
+                            <input type="text" class="attendance-obs w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs" value="${obs}" placeholder="Sin observaciones">
                         </td>
                     </tr>
                 `;
-            });
+            }).join('') || '<tr><td colspan="4" class="p-4 text-center text-slate-400">Sin alumnos registrados</td></tr>';
         }
 
-        async function marcarAsistencia(alumnoId, presente) {
+        async function saveAttendance() {
             const fecha = document.getElementById('attendance-date').value;
-            const { error } = await supabaseClient.from('asistencia').insert([
-                { alumno_id: alumnoId, fecha: fecha, presente: presente }
-            ]);
+            const rows = document.querySelectorAll('#attendance-list-body tr[data-alumno-id]');
+            
+            const records = [];
+            rows.forEach(row => {
+                const alumno_id = parseInt(row.getAttribute('data-alumno-id'));
+                const presente = row.querySelector('.attendance-check').checked;
+                const observacion = row.querySelector('.attendance-obs').value;
+                records.push({ alumno_id, fecha, presente, observacion });
+            });
 
-            if (error) showToast('Error al marcar asistencia: ' + error.message, 'error');
-            else {
-                showToast('Asistencia registrada');
-                cargarAsistenciasCount();
+            if (records.length > 0) {
+                await supabaseClient.from('asistencia').delete().eq('fecha', fecha);
+                const { error } = await supabaseClient.from('asistencia').insert(records);
+                if (error) alert("Error al guardar asistencia: " + error.message);
+                else alert("Asistencias guardadas correctamente.");
             }
         }
 
-        function updateStudentDropdowns() {
-            const options = state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
-            const gradeSelect = document.getElementById('grade-student-id');
-            if (gradeSelect) gradeSelect.innerHTML = options;
+        // CALIFICACIONES
+        async function loadGradesList() {
+            const modulo = document.getElementById('grades-module').value;
+            const { data: notas } = await supabaseClient.from('calificaciones').select('*').eq('modulo', modulo);
+
+            const mapNotas = {};
+            (notas || []).forEach(n => {
+                mapNotas[n.alumno_id] = n;
+            });
+
+            const tbody = document.getElementById('grades-list-body');
+            tbody.innerHTML = globalAlumnos.map(a => {
+                const reg = mapNotas[a.id] || {};
+                return `
+                    <tr class="border-b border-slate-100" data-alumno-id="${a.id}">
+                        <td class="p-3 font-semibold">${a.nombres} ${a.apellidos}</td>
+                        <td class="p-3 text-slate-500">${modulo}</td>
+                        <td class="p-3">
+                            <input type="number" min="0" max="10" step="0.1" class="grade-input w-24 bg-slate-50 border border-slate-200 rounded p-1 text-sm font-bold text-center" value="${reg.nota !== undefined ? reg.nota : ''}">
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="3" class="p-4 text-center text-slate-400">Sin alumnos registrados</td></tr>';
         }
 
-        function openAddGradeModal() {
-            updateStudentDropdowns();
-            document.getElementById('grade-form').reset();
-            document.getElementById('grade-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('grade-modal').classList.remove('hidden');
+        async function saveGrades() {
+            const modulo = document.getElementById('grades-module').value;
+            const rows = document.querySelectorAll('#grades-list-body tr[data-alumno-id]');
+            const fechaHoy = new Date().toISOString().split('T')[0];
+
+            const records = [];
+            rows.forEach(row => {
+                const alumno_id = parseInt(row.getAttribute('data-alumno-id'));
+                const val = row.querySelector('.grade-input').value;
+                if (val !== '') {
+                    records.push({
+                        alumno_id,
+                        modulo,
+                        evaluacion: 'Evaluación Módulo',
+                        nota: parseFloat(val),
+                        fecha: fechaHoy
+                    });
+                }
+            });
+
+            if (records.length > 0) {
+                await supabaseClient.from('calificaciones').delete().eq('modulo', modulo);
+                const { error } = await supabaseClient.from('calificaciones').insert(records);
+                if (error) alert("Error al guardar calificaciones: " + error.message);
+                else alert("Calificaciones guardadas exitosamente.");
+            }
         }
 
-        async function handleGradeSubmit(e) {
-            e.preventDefault();
-            showToast('Calificación registrada');
-            closeModal('grade-modal');
-        }
-
-        function renderDocumentsGrid() {
+        // DOCUMENTOS
+        function renderDocuments() {
             const grid = document.getElementById('documents-grid');
-            grid.innerHTML = '';
-
-            const conDocumentos = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
-
-            if (conDocumentos.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 text-sm">No se han adjuntado documentos aún. Agrega archivos desde el formulario de registro.</div>`;
-                return;
-            }
-
-            conDocumentos.forEach(s => {
-                grid.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            grid.innerHTML = globalAlumnos.map(a => `
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center gap-3">
+                        <img src="${a.foto_url || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-full object-cover bg-slate-100">
                         <div>
-                            <div class="flex items-center space-x-3 mb-3">
-                                ${s.foto_url ? `<img src="${s.foto_url}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">${s.nombres ? s.nombres[0] : 'A'}</div>`}
-                                <div>
-                                    <h4 class="font-bold text-slate-900 text-sm">${s.nombres} ${s.apellidos}</h4>
-                                    <p class="text-xs text-slate-400">${s.maestro_responsable || 'Maestro no asignado'}</p>
-                                </div>
-                            </div>
-                            <div class="space-y-2 text-xs border-t border-slate-100 pt-3">
-                                ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-id-card text-indigo-600 mr-2"></i>DUI / Cédula</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
-                                ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-file-contract text-emerald-600 mr-2"></i>Partida Nacimiento</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
-                                ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-award text-amber-600 mr-2"></i>Certificados</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
-                            </div>
+                            <h4 class="font-bold text-slate-800">${a.nombres} ${a.apellidos}</h4>
+                            <p class="text-xs text-slate-500">${a.nivel}</p>
                         </div>
                     </div>
-                `;
-            });
+                    <div class="border-t border-slate-100 pt-3 grid grid-cols-2 gap-2 text-xs">
+                        ${a.dui_url ? `<a href="${a.dui_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-id-card"></i> DUI</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin DUI</span>'}
+                        ${a.partida_url ? `<a href="${a.partida_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-file"></i> Partida</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin Partida</span>'}
+                        ${a.certificado_url ? `<a href="${a.certificado_url}" target="_blank" class="p-2 bg-slate-50 rounded border text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-certificate"></i> Certificado</a>` : '<span class="p-2 bg-slate-50 text-slate-300 rounded">Sin Certificado</span>'}
+                    </div>
+                </div>
+            `).join('') || '<div class="p-4 text-center text-slate-400 col-span-full">Sin expediente registrado</div>';
         }
     </script>
 </body>
