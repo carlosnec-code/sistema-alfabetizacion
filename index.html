@@ -220,11 +220,10 @@
                                     <th class="p-3">Teléfono</th>
                                     <th class="p-3">Nivel Asignado</th>
                                     <th class="p-3">Rol</th>
-                                    <th class="p-3 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="maestros-list-body">
-                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Sin datos</td></tr>
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Sin datos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -581,11 +580,8 @@
                     <td class="p-3 text-slate-500">${m.telefono || 'N/A'}</td>
                     <td class="p-3"><span class="px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-md">${m.nivel_id || 'N/A'}</span></td>
                     <td class="p-3 text-slate-500">${m.rol_nivel || 'Colaborador'}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="editTeacher('${m.id}')" class="text-blue-600 hover:text-blue-800 p-1"><i class="fa-solid fa-pen"></i></button>
-                    </td>
                 </tr>
-            `).join('') || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
+            `).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">Sin maestros registrados</td></tr>';
         }
 
         function openTeacherModal() {
@@ -649,20 +645,6 @@
                 closeTeacherModal();
                 fetchMaestros();
             }
-        }
-
-        function editTeacher(id) {
-            const m = globalMaestros.find(item => item.id === id);
-            if (!m) return;
-            document.getElementById('teacher-id').value = m.id;
-            document.getElementById('teacher-nombre').value = m.nombre || '';
-            document.getElementById('teacher-email').value = m.email || '';
-            document.getElementById('teacher-telefono').value = m.telefono || '';
-            document.getElementById('teacher-dui').value = m.dui || '';
-            document.getElementById('teacher-nivel').value = m.nivel_id || 'Nivel 1';
-            document.getElementById('teacher-rol-nivel').value = m.rol_nivel || 'Líder de nivel';
-            document.getElementById('teacher-modal-title').innerText = 'Editar Maestro';
-            document.getElementById('teacher-modal').classList.remove('hidden');
         }
 
         // ALUMNOS CRUD
