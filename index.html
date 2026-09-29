@@ -781,10 +781,10 @@
             const select = document.getElementById('student-maestro');
             if (!select) return;
             
-            const lideres = state.teachers.filter(m => m.rol_nivel === 'Líder de nivel');
+            const lideres = state.teachers;
 
             if (lideres.length === 0) {
-                select.innerHTML = '<option value="">No hay líderes de nivel registrados</option>';
+                select.innerHTML = '<option value="">No hay maestros registrados</option>';
                 return;
             }
 
@@ -921,8 +921,18 @@
                 });
             }
 
-            // 2. Cargar Maestros del Nivel y sus Asistencias
-            const maestrosNivel = state.teachers.filter(m => m.nivel_asignado === nivelSeleccionado || m.nivel_id === nivelSeleccionado);
+            // 2. Cargar Maestros del Nivel y sus Asistencias (Filtro flexible)
+            let maestrosNivel = state.teachers.filter(m => {
+                const nav = (m.nivel_asignado || m.nivel_id || m.nivel || '').toLowerCase();
+                const sel = nivelSeleccionado.toLowerCase();
+                return nav === sel || sel.includes(nav) || nav.includes(sel);
+            });
+
+            // Si no hay maestros específicos de nivel, cargar todos para permitir marcar asistencia
+            if (maestrosNivel.length === 0) {
+                maestrosNivel = state.teachers;
+            }
+
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
 
@@ -937,12 +947,12 @@
             }
 
             if (maestrosNivel.length === 0) {
-                containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros asignados a este nivel.</p>`;
+                containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros registrados en la plataforma.</p>`;
             } else {
                 maestrosNivel.forEach(m => {
                     const isChecked = mapAsistenciaMaestros[m.id] === true ? 'checked' : '';
                     containerMaestros.innerHTML += `
-                        <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
                             <span class="font-bold text-slate-800">${m.nombre}</span>
                             <label class="flex items-center space-x-2 cursor-pointer">
                                 <span class="text-slate-500">Asistió</span>
@@ -1000,7 +1010,8 @@
                 });
 
                 if (registrosAlumnos.length > 0) {
-                    await supabaseClient.from('asistencia').upsert(registrosAlumnos, { onConflict: 'alumno_id,fecha' });
+                    const { error: errA } = await supabaseClient.from('asistencia').upsert(registrosAlumnos, { onConflict: 'alumno_id,fecha' });
+                    if (errA) throw new Error('Error al guardar asistencia de alumnos: ' + errA.message);
                 }
 
                 // 2. Guardar Asistencia de Maestros
@@ -1015,14 +1026,15 @@
                 });
 
                 if (registrosMaestros.length > 0) {
-                    await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros, { onConflict: 'maestro_id,fecha' });
+                    const { error: errM } = await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros, { onConflict: 'maestro_id,fecha' });
+                    if (errM) throw new Error('Error al guardar asistencia de maestros: ' + errM.message);
                 }
 
                 // 3. Guardar Bitácora / Avance Curricular
                 const actividades = document.getElementById('bitacora-actividades').value;
                 const tarea = document.getElementById('bitacora-tarea').value;
 
-                await supabaseClient.from('bitacora_clases').upsert([{
+                const { error: errB } = await supabaseClient.from('bitacora_clases').upsert([{
                     fecha: fecha,
                     nivel: nivel,
                     tema: tema || '',
@@ -1030,12 +1042,14 @@
                     tarea: tarea || ''
                 }], { onConflict: 'fecha,nivel' });
 
+                if (errB) throw new Error('Error al guardar la bitácora: ' + errB.message);
+
                 showToast('¡Información de la clase guardada exitosamente!');
                 cargarAsistenciasCount();
 
             } catch (err) {
                 console.error(err);
-                showToast('Error al guardar la información de la clase', 'error');
+                showToast(err.message || 'Error al guardar la información de la clase', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Información de la Clase</span>`;
