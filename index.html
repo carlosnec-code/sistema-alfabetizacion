@@ -215,7 +215,7 @@
                                 Los datos y expedientes adjuntos se almacenan de forma segura en la nube de Supabase.
                             </p>
                         </div>
-                        <button id="btn-dashboard-add-student" onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
+                        <button onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-user-plus"></i>
                             <span>Registrar Nuevo Alumno</span>
                         </button>
@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            <!-- TAB NUEVA: SEGUIMIENTO POR NIVEL -->
+            <!-- TAB: SEGUIMIENTO POR NIVEL -->
             <div id="tab-level-tracker" class="tab-content hidden flex-1 flex flex-col space-y-6">
                 <!-- Filtros Principales -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -235,7 +235,6 @@
                                 <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                                 <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
                                 <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
-                                <option value="Tercer Ciclo (Nivel 4)">Tercer Ciclo (Nivel 4)</option>
                             </select>
                         </div>
 
@@ -253,7 +252,7 @@
                 <!-- Contenido Principal: Asistencias y Avance -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Columna Izquierda: Asistencia de Alumnos (Checkboxes) -->
+                    <!-- Columna Izquierda: Asistencia de Alumnos -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
@@ -333,7 +332,7 @@
                         </span>
                         <input type="text" id="student-search" oninput="renderStudentsTable()" placeholder="Buscar por nombre, documento o maestro..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
                     </div>
-                    <button id="btn-add-student" onclick="openAddStudentModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
+                    <button onclick="openAddStudentModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Nuevo Alumno</span>
                     </button>
@@ -366,9 +365,9 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                             <i class="fa-solid fa-search"></i>
                         </span>
-                        <input type="text" id="teacher-search" oninput="renderTeachersTable()" placeholder="Buscar por nombre, DUI o dirección..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        <input type="text" id="teacher-search" oninput="renderTeachersTable()" placeholder="Buscar por nombre o DUI..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
                     </div>
-                    <button id="btn-add-teacher" onclick="openAddTeacherModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
+                    <button onclick="openAddTeacherModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all shadow-sm flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Nuevo Maestro</span>
                     </button>
@@ -381,7 +380,6 @@
                                 <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     <th class="py-3 px-4">Maestro</th>
                                     <th class="py-3 px-4">DUI / Contacto</th>
-                                    <th class="py-3 px-4">Dirección</th>
                                     <th class="py-3 px-4">Nivel Asignado</th>
                                     <th class="py-3 px-4">Rol en Nivel</th>
                                     <th class="py-3 px-4 text-center">DUI Adjunto</th>
@@ -434,7 +432,7 @@
                             <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
                         </select>
                     </div>
-                    <button id="btn-add-grade" onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
+                    <button onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-plus"></i>
                         <span>Registrar Nueva Nota</span>
                     </button>
@@ -471,7 +469,6 @@
         </main>
     </div>
 
-    <!-- MODALES EXISTENTES -->
     <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
     <div id="student-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
@@ -528,7 +525,6 @@
                             <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                             <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
                             <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
-                            <option value="Tercer Ciclo (Nivel 4)">Tercer Ciclo (Nivel 4)</option>
                         </select>
                     </div>
                     <div>
@@ -610,14 +606,21 @@
                         <input type="text" id="teacher-phone" placeholder="7000-0000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico</label>
-                        <input type="email" id="teacher-email" placeholder="maestro@correo.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Correo Electrónico *</label>
+                        <input type="email" id="teacher-email" required placeholder="maestro@correo.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Dirección</label>
-                    <input type="text" id="teacher-direccion" placeholder="Ej. Av. Principal #123, San Salvador" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <!-- SECCIÓN AGREGADA: CAMPOS DE CONTRASEÑA -->
+                <div id="teacher-password-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña de Acceso *</label>
+                        <input type="password" id="teacher-password" placeholder="••••••••" minlength="6" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Confirmar Contraseña *</label>
+                        <input type="password" id="teacher-password-confirm" placeholder="••••••••" minlength="6" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -628,7 +631,6 @@
                             <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                             <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
                             <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
-                            <option value="Tercer Ciclo (Nivel 4)">Tercer Ciclo (Nivel 4)</option>
                         </select>
                     </div>
                     <div>
@@ -708,15 +710,7 @@
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let state = { 
-            students: [], 
-            teachers: [], 
-            countAsistencias: 0, 
-            grades: [],
-            currentUser: null,
-            userRole: 'Admin', // Roles: 'Admin', 'Líder de nivel', 'Sublíder', 'Colaborador'
-            userLevel: null
-        };
+        let state = { students: [], teachers: [], countAsistencias: 0, grades: [] };
 
         window.onload = async function() {
             document.getElementById('attendance-date').valueAsDate = new Date();
@@ -724,14 +718,14 @@
             validarFechaLunesMartes();
 
             const { data: { session } } = await supabaseClient.auth.getSession();
-            await gestionarEstadoSesion(session);
+            gestionarEstadoSesion(session);
 
-            supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-                await gestionarEstadoSesion(session);
+            supabaseClient.auth.onAuthStateChange((_event, session) => {
+                gestionarEstadoSesion(session);
             });
         };
 
-        async function gestionarEstadoSesion(session) {
+        function gestionarEstadoSesion(session) {
             const loginContainer = document.getElementById('login-container');
             const appContainer = document.getElementById('app-container');
             const userBadge = document.getElementById('user-email-badge');
@@ -739,82 +733,14 @@
             if (session) {
                 loginContainer.classList.add('hidden');
                 appContainer.classList.remove('hidden');
-                state.currentUser = session.user;
                 if (userBadge) {
                     userBadge.textContent = session.user.email;
                     userBadge.classList.remove('hidden');
                 }
-                
-                // Determinar el Rol y el Nivel del Usuario consultando la tabla 'maestros'
-                await cargarPerfilUsuario(session.user.email);
-                aplicarPermisosSegunRol();
                 cargarDatos();
             } else {
                 loginContainer.classList.remove('hidden');
                 appContainer.classList.add('hidden');
-                state.currentUser = null;
-                state.userRole = 'Admin';
-                state.userLevel = null;
-            }
-        }
-
-        async function cargarPerfilUsuario(email) {
-            const { data, error } = await supabaseClient
-                .from('maestros')
-                .select('*')
-                .eq('email', email)
-                .maybeSingle();
-
-            if (!error && data) {
-                state.userRole = data.rol_nivel || 'Colaborador';
-                state.userLevel = data.nivel_id || null;
-            } else {
-                // Si el correo no está registrado en la tabla maestros, se le considera Administrador global por defecto
-                state.userRole = 'Admin';
-                state.userLevel = null;
-            }
-        }
-
-        function aplicarPermisosSegunRol() {
-            const navTeachers = document.getElementById('nav-teachers');
-            const btnAddTeacher = document.getElementById('btn-add-teacher');
-            const btnAddStudent = document.getElementById('btn-add-student');
-            const btnDashboardAddStudent = document.getElementById('btn-dashboard-add-student');
-            const btnAddGrade = document.getElementById('btn-add-grade');
-            const trackerLevelSelect = document.getElementById('tracker-level-select');
-
-            // 1. Mostrar/Ocultar pestañas y botones según el Rol
-            if (state.userRole === 'Colaborador') {
-                if (navTeachers) navTeachers.classList.add('hidden');
-                if (btnAddTeacher) btnAddTeacher.classList.add('hidden');
-                if (btnAddStudent) btnAddStudent.classList.add('hidden');
-                if (btnDashboardAddStudent) btnDashboardAddStudent.classList.add('hidden');
-                if (btnAddGrade) btnAddGrade.classList.add('hidden');
-            } else if (state.userRole === 'Sublíder') {
-                if (navTeachers) navTeachers.classList.add('hidden');
-                if (btnAddTeacher) btnAddTeacher.classList.add('hidden');
-                if (btnAddStudent) btnAddStudent.classList.remove('hidden');
-                if (btnDashboardAddStudent) btnDashboardAddStudent.classList.remove('hidden');
-                if (btnAddGrade) btnAddGrade.classList.remove('hidden');
-            } else {
-                // Roles: Admin y 'Líder de nivel' tienen acceso completo
-                if (navTeachers) navTeachers.classList.remove('hidden');
-                if (btnAddTeacher) btnAddTeacher.classList.remove('hidden');
-                if (btnAddStudent) btnAddStudent.classList.remove('hidden');
-                if (btnDashboardAddStudent) btnDashboardAddStudent.classList.remove('hidden');
-                if (btnAddGrade) btnAddGrade.classList.remove('hidden');
-            }
-
-            // 2. Pre-seleccionar y ajustar el nivel si está restringido
-            if (state.userLevel && trackerLevelSelect) {
-                trackerLevelSelect.value = state.userLevel;
-                if (state.userRole === 'Sublíder' || state.userRole === 'Colaborador') {
-                    trackerLevelSelect.disabled = true;
-                } else {
-                    trackerLevelSelect.disabled = false;
-                }
-            } else if (trackerLevelSelect) {
-                trackerLevelSelect.disabled = false;
             }
         }
 
@@ -901,7 +827,7 @@
 
         async function cargarCalificaciones() {
             const moduloFiltro = document.getElementById('grade-period-select') ? document.getElementById('grade-period-select').value : 'TODOS';
-            let query = supabaseClient.from('calificaciones').select('*, alumnos(nombres, apellidos, nivel)').order('fecha', { ascending: false });
+            let query = supabaseClient.from('calificaciones').select('*, alumnos(nombres, apellidos)').order('fecha', { ascending: false });
 
             if (moduloFiltro && moduloFiltro !== 'TODOS') {
                 query = query.eq('modulo', moduloFiltro);
@@ -945,7 +871,12 @@
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
         }
 
         /* ----- MÓDULO NUEVO: SEGUIMIENTO POR NIVEL Y ASISTENCIA LUNES/MARTES ----- */
@@ -956,7 +887,7 @@
 
             const dateParts = inputFecha.value.split('-');
             const fechaObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            const dayNum = fechaObj.getDay(); // 0: Dom, 1: Lun, 2: Mar...
+            const dayNum = fechaObj.getDay();
 
             if (dayNum === 1) {
                 badge.textContent = "Clase de Lunes";
@@ -979,7 +910,6 @@
             const tbodyAlumnos = document.getElementById('tracker-students-tbody');
             tbodyAlumnos.innerHTML = '';
 
-            // Consultar asistencias guardadas para la fecha y nivel
             const { data: asistenciasPrevias } = await supabaseClient
                 .from('asistencia')
                 .select('*')
@@ -1059,7 +989,7 @@
 
         async function guardarBitacoraClase(e) {
             e.preventDefault();
-            showToast('Avance curricular y bitacora guardados');
+            showToast('Avance curricular y bitácora guardados');
             document.getElementById('tracker-bitacora-form').reset();
         }
 
@@ -1114,23 +1044,18 @@
         }
 
         function renderDashboard() {
-            let alumnosFiltrados = state.students;
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                alumnosFiltrados = state.students.filter(s => s.nivel === state.userLevel);
-            }
-
-            document.getElementById('stat-total-students').textContent = alumnosFiltrados.length;
+            document.getElementById('stat-total-students').textContent = state.students.length;
             document.getElementById('stat-avg-attendance').textContent = state.countAsistencias;
             
-            const nivel0Count = alumnosFiltrados.filter(s => s.nivel && s.nivel.includes('Nivel 0')).length;
+            const nivel0Count = state.students.filter(s => s.nivel && s.nivel.includes('Nivel 0')).length;
             document.getElementById('stat-nivel0').textContent = nivel0Count;
 
-            const docsCount = alumnosFiltrados.filter(s => s.dui_url || s.partida_url || s.certificado_url).length;
+            const docsCount = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url).length;
             document.getElementById('stat-total-docs').textContent = docsCount;
 
             const tbody = document.getElementById('dashboard-students-list');
             tbody.innerHTML = '';
-            const recent = alumnosFiltrados.slice(0, 5);
+            const recent = state.students.slice(0, 5);
             if (recent.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">No hay alumnos registrados.</td></tr>`;
                 return;
@@ -1161,12 +1086,7 @@
             const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = '';
 
-            let alumnosFiltrados = state.students;
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                alumnosFiltrados = state.students.filter(s => s.nivel === state.userLevel);
-            }
-
-            const filtered = alumnosFiltrados.filter(s => 
+            const filtered = state.students.filter(s => 
                 `${s.nombres} ${s.apellidos}`.toLowerCase().includes(search) || 
                 (s.identificacion && s.identificacion.toLowerCase().includes(search)) ||
                 (s.maestro_responsable && s.maestro_responsable.toLowerCase().includes(search))
@@ -1184,17 +1104,12 @@
 
                 const docsIcons = `
                     <div class="flex justify-center space-x-2 text-sm">
-                        ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" title="DUI" class="text-indigo-600 hover:text-indigo-800"><i class="fa-id-card"></i></a>` : ''}
+                        ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" title="DUI" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-id-card"></i></a>` : ''}
                         ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" title="Partida" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-file-contract"></i></a>` : ''}
                         ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" title="Certificado" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-award"></i></a>` : ''}
                         ${!s.dui_url && !s.partida_url && !s.certificado_url ? `<span class="text-xs text-slate-300">-</span>` : ''}
                     </div>
                 `;
-
-                const accionesHtml = (state.userRole === 'Admin' || state.userRole === 'Líder de nivel' || state.userRole === 'Sublíder') 
-                    ? `<button onclick="editStudent(${s.id})" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
-                       ${state.userRole !== 'Sublíder' ? `<button onclick="deleteStudent(${s.id})" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>` : ''}`
-                    : `<span class="text-xs text-slate-300">-</span>`;
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/80 transition-all">
@@ -1212,7 +1127,10 @@
                         <td class="py-3 px-4 text-slate-700 font-medium text-xs">${s.maestro_responsable || 'No asignado'}</td>
                         <td class="py-3 px-4"><span class="px-2.5 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
                         <td class="py-3 px-4 text-center">${docsIcons}</td>
-                        <td class="py-3 px-4 text-right space-x-1">${accionesHtml}</td>
+                        <td class="py-3 px-4 text-right space-x-1">
+                            <button onclick="editStudent(${s.id})" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteStudent(${s.id})" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
+                        </td>
                     </tr>
                 `;
             });
@@ -1226,11 +1144,6 @@
             document.getElementById('preview-foto').classList.add('hidden');
             document.getElementById('icon-foto-default').classList.remove('hidden');
             poblarSelectMaestros();
-            
-            if (state.userLevel) {
-                document.getElementById('student-level').value = state.userLevel;
-            }
-
             document.getElementById('student-modal-title').textContent = 'Registrar Nuevo Alumno';
             document.getElementById('student-modal').classList.remove('hidden');
         }
@@ -1315,7 +1228,7 @@
                 showToast('Error inesperado al subir archivos', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Alumno`;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Alumno</span>`;
             }
         }
 
@@ -1337,12 +1250,11 @@
 
             const filtered = state.teachers.filter(m => 
                 (m.nombre && m.nombre.toLowerCase().includes(search)) || 
-                (m.dui && m.dui.toLowerCase().includes(search)) ||
-                (m.direccion && m.direccion.toLowerCase().includes(search))
+                (m.dui && m.dui.toLowerCase().includes(search))
             );
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 text-sm">No hay maestros registrados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">No hay maestros registrados.</td></tr>`;
                 return;
             }
 
@@ -1367,7 +1279,6 @@
                             <div class="text-slate-800 font-medium text-xs">${m.dui || 'Sin DUI'}</div>
                             <div class="text-xs text-slate-400">${m.telefono || 'Sin Teléfono'}</div>
                         </td>
-                        <td class="py-3 px-4 text-slate-700 text-xs">${m.direccion || 'Sin Dirección'}</td>
                         <td class="py-3 px-4 text-slate-700 font-medium text-xs">${m.nivel_id || 'Sin Asignar'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 ${rolColor} rounded-lg text-xs font-semibold">${m.rol_nivel || 'Colaborador'}</span>
@@ -1387,11 +1298,15 @@
         function openAddTeacherModal() {
             document.getElementById('teacher-form').reset();
             document.getElementById('teacher-id').value = '';
-            document.getElementById('teacher-direccion').value = '';
             document.getElementById('teacher-foto').value = '';
             document.getElementById('preview-teacher-foto').src = '';
             document.getElementById('preview-teacher-foto').classList.add('hidden');
             document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
+            
+            // Mostrar los campos de contraseña para un nuevo registro
+            const passContainer = document.getElementById('teacher-password-container');
+            if (passContainer) passContainer.classList.remove('hidden');
+
             document.getElementById('teacher-modal-title').textContent = 'Registrar Nuevo Maestro';
             document.getElementById('teacher-modal').classList.remove('hidden');
         }
@@ -1405,9 +1320,12 @@
             document.getElementById('teacher-dui').value = m.dui || '';
             document.getElementById('teacher-phone').value = m.telefono || '';
             document.getElementById('teacher-email').value = m.email || '';
-            document.getElementById('teacher-direccion').value = m.direccion || '';
             document.getElementById('teacher-nivel').value = m.nivel_id || 'Inicial (Nivel 0)';
             document.getElementById('teacher-rol').value = m.rol_nivel || 'Colaborador';
+
+            // Ocultar creación de contraseña al editar
+            const passContainer = document.getElementById('teacher-password-container');
+            if (passContainer) passContainer.classList.add('hidden');
 
             if (m.foto_url) {
                 document.getElementById('preview-teacher-foto').src = m.foto_url;
@@ -1423,6 +1341,7 @@
             document.getElementById('teacher-modal').classList.remove('hidden');
         }
 
+        /* ----- FUNCIÓN ACTUALIZADA: CREA USUARIO EN SUPABASE AUTH Y REGISTRA EN MAESTROS ----- */
         async function handleTeacherSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-teacher');
@@ -1433,15 +1352,49 @@
                 const idInput = document.getElementById('teacher-id').value;
                 const mExistente = idInput ? state.teachers.find(item => item.id == idInput) : null;
 
+                const email = document.getElementById('teacher-email').value;
+                const password = document.getElementById('teacher-password').value;
+                const passwordConfirm = document.getElementById('teacher-password-confirm').value;
+
+                // Validación de contraseña solo si es registro nuevo
+                if (!idInput) {
+                    if (!password || password.length < 6) {
+                        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Maestro</span>`;
+                        return;
+                    }
+                    if (password !== passwordConfirm) {
+                        showToast('Las contraseñas no coinciden', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Maestro</span>`;
+                        return;
+                    }
+
+                    // 1. Crear el usuario en Supabase Auth
+                    const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password
+                    });
+
+                    if (authError) {
+                        showToast('Error al crear cuenta de usuario: ' + authError.message, 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Maestro</span>`;
+                        return;
+                    }
+                }
+
+                // 2. Subir imágenes si aplica
                 const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'maestros_fotos');
                 const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'maestros_duis');
 
+                // 3. Insertar/Actualizar en la tabla de base de datos
                 const payload = {
                     nombre: document.getElementById('teacher-nombre').value,
                     dui: document.getElementById('teacher-dui').value,
                     telefono: document.getElementById('teacher-phone').value,
-                    email: document.getElementById('teacher-email').value,
-                    direccion: document.getElementById('teacher-direccion').value,
+                    email: email,
                     nivel_id: document.getElementById('teacher-nivel').value,
                     rol_nivel: document.getElementById('teacher-rol').value,
                     foto_url: fotoUrlNueva || (mExistente ? mExistente.foto_url : null),
@@ -1458,9 +1411,9 @@
                 }
 
                 if (error) {
-                    showToast('Error al guardar maestro: ' + error.message, 'error');
+                    showToast('Error al guardar maestro en base de datos: ' + error.message, 'error');
                 } else {
-                    showToast(idInput ? 'Maestro actualizado con éxito' : 'Maestro registrado con éxito');
+                    showToast(idInput ? 'Maestro actualizado con éxito' : 'Maestro y usuario registrados con éxito');
                     closeModal('teacher-modal');
                     await cargarMaestros();
                 }
@@ -1468,7 +1421,7 @@
                 showToast('Error inesperado al guardar maestro', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Maestro`;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Maestro</span>`;
             }
         }
 
@@ -1487,17 +1440,12 @@
             const tbody = document.getElementById('attendance-table-body');
             tbody.innerHTML = '';
 
-            let alumnosFiltrados = state.students;
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                alumnosFiltrados = state.students.filter(s => s.nivel === state.userLevel);
-            }
-
-            if (alumnosFiltrados.length === 0) {
+            if (state.students.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">No hay alumnos.</td></tr>`;
                 return;
             }
 
-            alumnosFiltrados.forEach(s => {
+            state.students.forEach(s => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/80">
                         <td class="py-3 px-4 font-bold text-slate-900">${s.nombres} ${s.apellidos}</td>
@@ -1526,12 +1474,7 @@
         }
 
         function updateStudentDropdowns() {
-            let alumnosFiltrados = state.students;
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                alumnosFiltrados = state.students.filter(s => s.nivel === state.userLevel);
-            }
-
-            const options = alumnosFiltrados.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
+            const options = state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
             const gradeSelect = document.getElementById('grade-student-id');
             if (gradeSelect) gradeSelect.innerHTML = options;
         }
@@ -1575,17 +1518,12 @@
             const tbody = document.getElementById('grades-table-body');
             tbody.innerHTML = '';
 
-            let calificacionesFiltradas = state.grades || [];
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                calificacionesFiltradas = calificacionesFiltradas.filter(g => g.alumnos && g.alumnos.nivel === state.userLevel);
-            }
-
-            if (!calificacionesFiltradas || calificacionesFiltradas.length === 0) {
+            if (!state.grades || state.grades.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">No se han registrado calificaciones todavía.</td></tr>`;
                 return;
             }
 
-            calificacionesFiltradas.forEach(g => {
+            state.grades.forEach(g => {
                 const alumnoNombre = g.alumnos ? `${g.alumnos.nombres} ${g.alumnos.apellidos}` : 'Alumno no encontrado';
                 const notaColor = g.nota >= 7 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
                                   g.nota >= 5 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-rose-700 bg-rose-50 border-rose-200';
@@ -1608,12 +1546,7 @@
             const grid = document.getElementById('documents-grid');
             grid.innerHTML = '';
 
-            let alumnosFiltrados = state.students;
-            if (state.userLevel && (state.userRole === 'Sublíder' || state.userRole === 'Colaborador')) {
-                alumnosFiltrados = state.students.filter(s => s.nivel === state.userLevel);
-            }
-
-            const conDocumentos = alumnosFiltrados.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
+            const conDocumentos = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
 
             if (conDocumentos.length === 0) {
                 grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 text-sm">No se han adjuntado documentos aún. Agrega archivos desde el formulario de registro.</div>`;
@@ -1632,7 +1565,7 @@
                                 </div>
                             </div>
                             <div class="space-y-2 text-xs border-t border-slate-100 pt-3">
-                                ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-id-card text-indigo-600 mr-2"></i>DUI / Cédula</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
+                                ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-id-card text-indigo-600 mr-2"></i>DUI / Cédula</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
                                 ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-file-contract text-emerald-600 mr-2"></i>Partida Nacimiento</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
                                 ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-award text-amber-600 mr-2"></i>Certificados</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
                             </div>
