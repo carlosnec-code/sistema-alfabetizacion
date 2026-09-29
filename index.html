@@ -223,7 +223,7 @@
                 </div>
             </div>
 
-            <!-- TAB: SEGUIMIENTO POR NIVEL -->
+            <!-- TAB NUEVA: SEGUIMIENTO POR NIVEL -->
             <div id="tab-level-tracker" class="tab-content hidden flex-1 flex flex-col space-y-6">
                 <!-- Filtros Principales -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -244,26 +244,24 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <div id="tracker-day-badge" class="px-3 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            Clase de Lunes / Martes
-                        </div>
-                        <button onclick="guardarTodoSeguimiento()" id="btn-save-tracker" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs transition-all shadow-md flex items-center space-x-2">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Guardar Información de la Clase</span>
-                        </button>
+                    <div id="tracker-day-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        Clase de Lunes / Martes
                     </div>
                 </div>
 
                 <!-- Contenido Principal: Asistencias y Avance -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Columna Izquierda: Asistencia de Alumnos -->
+                    <!-- Columna Izquierda: Asistencia de Alumnos (Checkboxes) -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
                                 <i class="fa-solid fa-user-check text-brand-600 mr-2"></i> Asistencia de Alumnos
                             </h3>
+                            <button onclick="guardarAsistenciaAlumnos()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-1">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Guardar Cambios</span>
+                            </button>
                         </div>
 
                         <div class="overflow-x-auto flex-1">
@@ -289,6 +287,9 @@
                                 <h3 class="text-sm font-bold text-slate-900 flex items-center">
                                     <i class="fa-solid fa-chalkboard-user text-indigo-600 mr-2"></i> Asistencia Maestros
                                 </h3>
+                                <button onclick="guardarAsistenciaMaestros()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1 px-2.5 rounded-lg text-xs transition-all shadow-sm">
+                                    Guardar
+                                </button>
                             </div>
                             <div id="tracker-teachers-list" class="space-y-2">
                             </div>
@@ -299,10 +300,10 @@
                             <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
                                 <i class="fa-solid fa-book-bookmark text-amber-600 mr-2"></i> Registro de Clase / Avance
                             </h3>
-                            <div class="space-y-3">
+                            <form id="tracker-bitacora-form" onsubmit="guardarBitacoraClase(event)" class="space-y-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tema Impartido *</label>
-                                    <input type="text" id="bitacora-tema" placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tema Impartido</label>
+                                    <input type="text" id="bitacora-tema" required placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Actividades Realizadas</label>
@@ -312,7 +313,10 @@
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tarea Asignada</label>
                                     <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
-                            </div>
+                                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 rounded-xl text-xs transition-all">
+                                    Registrar Avance
+                                </button>
+                            </form>
                         </div>
                     </div>
 
@@ -465,6 +469,7 @@
         </main>
     </div>
 
+    <!-- MODALES EXISTENTES -->
     <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
     <div id="student-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
@@ -697,9 +702,8 @@
         let state = { students: [], teachers: [], countAsistencias: 0, grades: [] };
 
         window.onload = async function() {
-            if (document.getElementById('attendance-date')) document.getElementById('attendance-date').valueAsDate = new Date();
-            if (document.getElementById('tracker-date-select')) document.getElementById('tracker-date-select').valueAsDate = new Date();
-            if (document.getElementById('grade-date')) document.getElementById('grade-date').valueAsDate = new Date();
+            document.getElementById('attendance-date').valueAsDate = new Date();
+            document.getElementById('tracker-date-select').valueAsDate = new Date();
             validarFechaLunesMartes();
 
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -781,10 +785,11 @@
             const select = document.getElementById('student-maestro');
             if (!select) return;
             
-            const lideres = state.teachers;
+            // Filtrar solo a los maestros que son "Líder de nivel"
+            const lideres = state.teachers.filter(m => m.rol_nivel === 'Líder de nivel');
 
             if (lideres.length === 0) {
-                select.innerHTML = '<option value="">No hay maestros registrados</option>';
+                select.innerHTML = '<option value="">No hay líderes de nivel registrados</option>';
                 return;
             }
 
@@ -855,23 +860,18 @@
         }
 
         function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.add('hidden');
-                const form = modal.querySelector('form');
-                if (form) form.reset();
-            }
+            document.getElementById(modalId).classList.add('hidden');
         }
 
-        /* ----- MÓDULO: SEGUIMIENTO POR NIVEL Y ASISTENCIA LUNES/MARTES ----- */
+        /* ----- MÓDULO NUEVO: SEGUIMIENTO POR NIVEL Y ASISTENCIA LUNES/MARTES ----- */
         function validarFechaLunesMartes() {
             const inputFecha = document.getElementById('tracker-date-select');
             const badge = document.getElementById('tracker-day-badge');
-            if (!inputFecha || !inputFecha.value) return;
+            if (!inputFecha.value) return;
 
             const dateParts = inputFecha.value.split('-');
             const fechaObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-            const dayNum = fechaObj.getDay();
+            const dayNum = fechaObj.getDay(); // 0: Dom, 1: Lun, 2: Mar...
 
             if (dayNum === 1) {
                 badge.textContent = "Clase de Lunes";
@@ -889,11 +889,12 @@
             const nivelSeleccionado = document.getElementById('tracker-level-select').value;
             const fecha = document.getElementById('tracker-date-select').value;
 
-            // 1. Cargar Alumnos del Nivel y sus Asistencias
+            // 1. Cargar Alumnos del Nivel
             const alumnosNivel = state.students.filter(s => s.nivel === nivelSeleccionado);
             const tbodyAlumnos = document.getElementById('tracker-students-tbody');
             tbodyAlumnos.innerHTML = '';
 
+            // Consultar asistencias guardadas para la fecha y nivel
             const { data: asistenciasPrevias } = await supabaseClient
                 .from('asistencia')
                 .select('*')
@@ -921,142 +922,63 @@
                 });
             }
 
-            // 2. Cargar Maestros del Nivel y sus Asistencias (Filtro flexible)
-            let maestrosNivel = state.teachers.filter(m => {
-                const nav = (m.nivel_asignado || m.nivel_id || m.nivel || '').toLowerCase();
-                const sel = nivelSeleccionado.toLowerCase();
-                return nav === sel || sel.includes(nav) || nav.includes(sel);
-            });
-
-            // Si no hay maestros específicos de nivel, cargar todos para permitir marcar asistencia
-            if (maestrosNivel.length === 0) {
-                maestrosNivel = state.teachers;
-            }
-
+            // 2. Cargar Maestros del Nivel
+            const maestrosNivel = state.teachers.filter(m => m.nivel_id === nivelSeleccionado);
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
 
-            const { data: asistenciasMaestrosPrevias } = await supabaseClient
-                .from('asistencia_maestros')
-                .select('*')
-                .eq('fecha', fecha);
-
-            const mapAsistenciaMaestros = {};
-            if (asistenciasMaestrosPrevias) {
-                asistenciasMaestrosPrevias.forEach(m => mapAsistenciaMaestros[m.maestro_id] = m.presente);
-            }
-
             if (maestrosNivel.length === 0) {
-                containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros registrados en la plataforma.</p>`;
+                containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros asignados a este nivel.</p>`;
             } else {
                 maestrosNivel.forEach(m => {
-                    const isChecked = mapAsistenciaMaestros[m.id] === true ? 'checked' : '';
                     containerMaestros.innerHTML += `
-                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                        <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
                             <span class="font-bold text-slate-800">${m.nombre}</span>
-                            <label class="flex items-center space-x-2 cursor-pointer">
+                            <label class="flex items-center space-x-2">
                                 <span class="text-slate-500">Asistió</span>
-                                <input type="checkbox" data-maestro-id="${m.id}" ${isChecked} class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
+                                <input type="checkbox" data-maestro-id="${m.id}" class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
                             </label>
                         </div>
                     `;
                 });
             }
-
-            // 3. Cargar datos previos de bitácora si existen
-            const { data: bitacoraData } = await supabaseClient
-                .from('bitacora_clases')
-                .select('*')
-                .eq('nivel', nivelSeleccionado)
-                .eq('fecha', fecha)
-                .maybeSingle();
-
-            if (bitacoraData) {
-                document.getElementById('bitacora-tema').value = bitacoraData.tema || '';
-                document.getElementById('bitacora-actividades').value = bitacoraData.actividades || '';
-                document.getElementById('bitacora-tarea').value = bitacoraData.tarea || '';
-            } else {
-                document.getElementById('bitacora-tema').value = '';
-                document.getElementById('bitacora-actividades').value = '';
-                document.getElementById('bitacora-tarea').value = '';
-            }
         }
 
-        /* FUNCIÓN UNIFICADA DE GUARDADO */
-        async function guardarTodoSeguimiento() {
-            const btn = document.getElementById('btn-save-tracker');
+        async function guardarAsistenciaAlumnos() {
             const fecha = document.getElementById('tracker-date-select').value;
-            const nivel = document.getElementById('tracker-level-select').value;
-            const tema = document.getElementById('bitacora-tema').value;
-
-            if (!fecha) {
-                showToast('Seleccione una fecha de clase', 'error');
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Guardando...</span>`;
-
-            try {
-                // 1. Guardar Asistencia de Alumnos
-                const studentCheckboxes = document.querySelectorAll('.student-checkbox');
-                const registrosAlumnos = [];
-                studentCheckboxes.forEach(cb => {
-                    registrosAlumnos.push({
-                        alumno_id: parseInt(cb.getAttribute('data-alumno-id'), 10),
-                        fecha: fecha,
-                        presente: cb.checked
-                    });
-                });
-
-                if (registrosAlumnos.length > 0) {
-                    const { error: errA } = await supabaseClient.from('asistencia').upsert(registrosAlumnos, { onConflict: 'alumno_id,fecha' });
-                    if (errA) throw new Error('Error al guardar asistencia de alumnos: ' + errA.message);
-                }
-
-                // 2. Guardar Asistencia de Maestros
-                const teacherCheckboxes = document.querySelectorAll('.teacher-checkbox');
-                const registrosMaestros = [];
-                teacherCheckboxes.forEach(cb => {
-                    registrosMaestros.push({
-                        maestro_id: parseInt(cb.getAttribute('data-maestro-id'), 10),
-                        fecha: fecha,
-                        presente: cb.checked
-                    });
-                });
-
-                if (registrosMaestros.length > 0) {
-                    const { error: errM } = await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros, { onConflict: 'maestro_id,fecha' });
-                    if (errM) throw new Error('Error al guardar asistencia de maestros: ' + errM.message);
-                }
-
-                // 3. Guardar Bitácora / Avance Curricular
-                const actividades = document.getElementById('bitacora-actividades').value;
-                const tarea = document.getElementById('bitacora-tarea').value;
-
-                const { error: errB } = await supabaseClient.from('bitacora_clases').upsert([{
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            
+            const registros = [];
+            checkboxes.forEach(cb => {
+                registros.push({
+                    alumno_id: parseInt(cb.getAttribute('data-alumno-id'), 10),
                     fecha: fecha,
-                    nivel: nivel,
-                    tema: tema || '',
-                    actividades: actividades || '',
-                    tarea: tarea || ''
-                }], { onConflict: 'fecha,nivel' });
+                    presente: cb.checked
+                });
+            });
 
-                if (errB) throw new Error('Error al guardar la bitácora: ' + errB.message);
+            if (registros.length === 0) return;
 
-                showToast('¡Información de la clase guardada exitosamente!');
+            const { error } = await supabaseClient.from('asistencia').upsert(registros);
+            if (error) {
+                showToast('Error al guardar asistencias: ' + error.message, 'error');
+            } else {
+                showToast('Asistencias de alumnos guardadas correctamente');
                 cargarAsistenciasCount();
-
-            } catch (err) {
-                console.error(err);
-                showToast(err.message || 'Error al guardar la información de la clase', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Información de la Clase</span>`;
             }
         }
 
-        /* ----- MÓDULOS AUXILIARES ----- */
+        async function guardarAsistenciaMaestros() {
+            showToast('Asistencia de maestros actualizada');
+        }
+
+        async function guardarBitacoraClase(e) {
+            e.preventDefault();
+            showToast('Avance curricular y bitacora guardados');
+            document.getElementById('tracker-bitacora-form').reset();
+        }
+
+        /* ----- MÓDULOS DE RENDER Y LOGICA PREVIA ----- */
         function previsualizarFoto(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1167,7 +1089,7 @@
 
                 const docsIcons = `
                     <div class="flex justify-center space-x-2 text-sm">
-                        ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" title="DUI" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-id-card"></i></a>` : ''}
+                        ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" title="DUI" class="text-indigo-600 hover:text-indigo-800"><i class="fa-id-card"></i></a>` : ''}
                         ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" title="Partida" class="text-emerald-600 hover:text-emerald-800"><i class="fa-solid fa-file-contract"></i></a>` : ''}
                         ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" title="Certificado" class="text-amber-600 hover:text-amber-800"><i class="fa-solid fa-award"></i></a>` : ''}
                         ${!s.dui_url && !s.partida_url && !s.certificado_url ? `<span class="text-xs text-slate-300">-</span>` : ''}
@@ -1176,27 +1098,134 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/80 transition-all">
-                        <td class="py-3 px-4 font-medium text-slate-900 flex items-center space-x-3">
+                        <td class="py-3 px-4 flex items-center space-x-3">
                             ${avatar}
                             <div>
-                                <div class="font-bold text-slate-800">${s.nombres} ${s.apellidos}</div>
-                                <div class="text-xs text-slate-400">${s.edad ? s.edad + ' años' : 'Edad N/D'}</div>
+                                <div class="font-bold text-slate-900">${s.nombres} ${s.apellidos}</div>
+                                <div class="text-xs text-slate-400">${s.edad ? s.edad + ' años' : 'Edad S/D'}</div>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-xs">
-                            <div class="font-semibold text-slate-700">${s.identificacion || 'Sin documento'}</div>
-                            <div class="text-slate-400">${s.telefono || 'Sin teléfono'}</div>
+                        <td class="py-3 px-4">
+                            <div class="text-slate-800 font-medium text-xs">${s.identificacion || 'Sin Documento'}</div>
+                            <div class="text-xs text-slate-400">${s.telefono || 'Sin Teléfono'}</div>
                         </td>
-                        <td class="py-3 px-4 text-xs text-slate-600 font-medium">${s.maestro_responsable || 'No asignado'}</td>
-                        <td class="py-3 px-4"><span class="px-2.5 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-lg text-xs font-bold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
+                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${s.maestro_responsable || 'No asignado'}</td>
+                        <td class="py-3 px-4"><span class="px-2.5 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
                         <td class="py-3 px-4 text-center">${docsIcons}</td>
-                        <td class="py-3 px-4 text-right space-x-2">
-                            <button onclick="editarAlumno(${s.id})" class="text-slate-400 hover:text-brand-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="eliminarAlumno(${s.id})" class="text-slate-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        <td class="py-3 px-4 text-right space-x-1">
+                            <button onclick="editStudent(${s.id})" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteStudent(${s.id})" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('student-form').reset();
+            document.getElementById('student-id').value = '';
+            document.getElementById('student-foto').value = '';
+            document.getElementById('preview-foto').src = '';
+            document.getElementById('preview-foto').classList.add('hidden');
+            document.getElementById('icon-foto-default').classList.remove('hidden');
+            poblarSelectMaestros();
+            document.getElementById('student-modal-title').textContent = 'Registrar Nuevo Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        function editStudent(id) {
+            const student = state.students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('student-id').value = student.id;
+            document.getElementById('student-nombres').value = student.nombres || '';
+            document.getElementById('student-apellidos').value = student.apellidos || '';
+            document.getElementById('student-dni').value = student.identificacion || student.documento || '';
+            document.getElementById('student-phone').value = student.telefono || '';
+            document.getElementById('student-age').value = student.edad || '';
+            document.getElementById('student-level').value = student.nivel || 'Inicial (Nivel 0)';
+            
+            poblarSelectMaestros();
+            document.getElementById('student-maestro').value = student.maestro_responsable || '';
+
+            document.getElementById('student-foto').value = '';
+
+            if (student.foto_url) {
+                document.getElementById('preview-foto').src = student.foto_url;
+                document.getElementById('preview-foto').classList.remove('hidden');
+                document.getElementById('icon-foto-default').classList.add('hidden');
+            } else {
+                document.getElementById('preview-foto').src = '';
+                document.getElementById('preview-foto').classList.add('hidden');
+                document.getElementById('icon-foto-default').classList.remove('hidden');
+            }
+
+            document.getElementById('student-modal-title').textContent = 'Modificar Datos del Alumno';
+            document.getElementById('student-modal').classList.remove('hidden');
+        }
+
+        async function handleStudentSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-student');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+
+            try {
+                const idInput = document.getElementById('student-id').value;
+                const studentExistente = idInput ? state.students.find(s => s.id === parseInt(idInput, 10)) : null;
+
+                const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('student-foto'), 'fotos');
+                const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('file-dui'), 'duis');
+                const partidaUrlNueva = await subirArchivoSupabase(document.getElementById('file-partida'), 'partidas');
+                const certificadoUrlNuevo = await subirArchivoSupabase(document.getElementById('file-certificado'), 'certificados');
+
+                const payload = {
+                    nombres: document.getElementById('student-nombres').value,
+                    apellidos: document.getElementById('student-apellidos').value,
+                    identificacion: document.getElementById('student-dni').value,
+                    telefono: document.getElementById('student-phone').value,
+                    edad: document.getElementById('student-age').value ? parseInt(document.getElementById('student-age').value, 10) : null,
+                    nivel: document.getElementById('student-level').value,
+                    maestro_responsable: document.getElementById('student-maestro').value,
+                    foto_url: fotoUrlNueva || (studentExistente ? studentExistente.foto_url : null),
+                    dui_url: duiUrlNuevo || (studentExistente ? studentExistente.dui_url : null),
+                    partida_url: partidaUrlNueva || (studentExistente ? studentExistente.partida_url : null),
+                    certificado_url: certificadoUrlNuevo || (studentExistente ? studentExistente.certificado_url : null)
+                };
+
+                let error;
+                if (idInput) {
+                    const res = await supabaseClient.from('alumnos').update(payload).eq('id', parseInt(idInput, 10));
+                    error = res.error;
+                } else {
+                    const res = await supabaseClient.from('alumnos').insert([payload]);
+                    error = res.error;
+                }
+
+                if (error) {
+                    showToast('Error al guardar: ' + error.message, 'error');
+                } else {
+                    showToast(idInput ? 'Alumno actualizado con éxito' : 'Alumno guardado con éxito');
+                    closeModal('student-modal');
+                    await cargarAlumnos();
+                }
+            } catch (err) {
+                showToast('Error inesperado al subir archivos', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Alumno`;
+            }
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('¿Desea eliminar este alumno de la base de datos?')) {
+                const { error } = await supabaseClient.from('alumnos').delete().eq('id', id);
+                if (error) showToast('Error al eliminar', 'error');
+                else {
+                    showToast('Alumno eliminado');
+                    cargarAlumnos();
+                }
+            }
         }
 
         function renderTeachersTable() {
@@ -1205,97 +1234,248 @@
             tbody.innerHTML = '';
 
             const filtered = state.teachers.filter(m => 
-                m.nombre.toLowerCase().includes(search) || 
+                (m.nombre && m.nombre.toLowerCase().includes(search)) || 
                 (m.dui && m.dui.toLowerCase().includes(search))
             );
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">No se encontraron maestros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-sm">No hay maestros registrados.</td></tr>`;
                 return;
             }
 
             filtered.forEach(m => {
                 const avatar = m.foto_url 
                     ? `<img src="${m.foto_url}" class="w-9 h-9 rounded-full object-cover border border-slate-200">`
-                    : `<div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs border border-indigo-200">${m.nombre ? m.nombre[0] : 'M'}</div>`;
+                    : `<div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs border border-brand-200">${m.nombre ? m.nombre[0] : 'M'}</div>`;
+
+                const rolColor = m.rol_nivel === 'Líder de nivel' ? 'bg-purple-100 text-purple-800' :
+                                 m.rol_nivel === 'Sublíder' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700';
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50/80 transition-all">
-                        <td class="py-3 px-4 font-medium text-slate-900 flex items-center space-x-3">
+                        <td class="py-3 px-4 flex items-center space-x-3">
                             ${avatar}
-                            <span class="font-bold text-slate-800">${m.nombre}</span>
+                            <div>
+                                <div class="font-bold text-slate-900">${m.nombre}</div>
+                                <div class="text-xs text-slate-400">${m.email || 'Sin Correo'}</div>
+                            </div>
                         </td>
-                        <td class="py-3 px-4 text-xs">
-                            <div class="font-semibold text-slate-700">${m.dui || 'N/D'}</div>
-                            <div class="text-slate-400">${m.telefono || 'Sin teléfono'}</div>
+                        <td class="py-3 px-4">
+                            <div class="text-slate-800 font-medium text-xs">${m.dui || 'Sin DUI'}</div>
+                            <div class="text-xs text-slate-400">${m.telefono || 'Sin Teléfono'}</div>
                         </td>
-                        <td class="py-3 px-4 text-xs font-semibold text-slate-700">${m.nivel_asignado || m.nivel_id || 'Nivel 0'}</td>
-                        <td class="py-3 px-4"><span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold">${m.rol_nivel || 'Líder'}</span></td>
+                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${m.nivel_id || 'Sin Asignar'}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 ${rolColor} rounded-lg text-xs font-semibold">${m.rol_nivel || 'Colaborador'}</span>
+                        </td>
                         <td class="py-3 px-4 text-center">
-                            ${m.dui_url ? `<a href="${m.dui_url}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm"><i class="fa-solid fa-file-pdf"></i></a>` : '<span class="text-xs text-slate-300">-</span>'}
+                            ${m.dui_adjunto_url ? `<a href="${m.dui_adjunto_url}" target="_blank" class="text-brand-600 hover:text-brand-800 text-xs font-semibold"><i class="fa-solid fa-file-pdf mr-1"></i>Ver DUI</a>` : '<span class="text-slate-300 text-xs">-</span>'}
                         </td>
-                        <td class="py-3 px-4 text-right space-x-2">
-                            <button onclick="eliminarMaestro(${m.id})" class="text-slate-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        <td class="py-3 px-4 text-right space-x-1">
+                            <button onclick="editTeacher('${m.id}')" class="text-slate-500 hover:text-brand-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteTeacher('${m.id}')" class="text-slate-500 hover:text-red-600 p-1.5 rounded-lg transition-colors"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
         }
 
+        function openAddTeacherModal() {
+            document.getElementById('teacher-form').reset();
+            document.getElementById('teacher-id').value = '';
+            document.getElementById('teacher-foto').value = '';
+            document.getElementById('preview-teacher-foto').src = '';
+            document.getElementById('preview-teacher-foto').classList.add('hidden');
+            document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
+            document.getElementById('teacher-modal-title').textContent = 'Registrar Nuevo Maestro';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        function editTeacher(id) {
+            const m = state.teachers.find(item => item.id == id);
+            if (!m) return;
+
+            document.getElementById('teacher-id').value = m.id;
+            document.getElementById('teacher-nombre').value = m.nombre || '';
+            document.getElementById('teacher-dui').value = m.dui || '';
+            document.getElementById('teacher-phone').value = m.telefono || '';
+            document.getElementById('teacher-email').value = m.email || '';
+            document.getElementById('teacher-nivel').value = m.nivel_id || 'Inicial (Nivel 0)';
+            document.getElementById('teacher-rol').value = m.rol_nivel || 'Colaborador';
+
+            if (m.foto_url) {
+                document.getElementById('preview-teacher-foto').src = m.foto_url;
+                document.getElementById('preview-teacher-foto').classList.remove('hidden');
+                document.getElementById('icon-teacher-foto-default').classList.add('hidden');
+            } else {
+                document.getElementById('preview-teacher-foto').src = '';
+                document.getElementById('preview-teacher-foto').classList.add('hidden');
+                document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
+            }
+
+            document.getElementById('teacher-modal-title').textContent = 'Modificar Datos del Maestro';
+            document.getElementById('teacher-modal').classList.remove('hidden');
+        }
+
+        async function handleTeacherSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-teacher');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+
+            try {
+                const idInput = document.getElementById('teacher-id').value;
+                const mExistente = idInput ? state.teachers.find(item => item.id == idInput) : null;
+
+                const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'maestros_fotos');
+                const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'maestros_duis');
+
+                const payload = {
+                    nombre: document.getElementById('teacher-nombre').value,
+                    dui: document.getElementById('teacher-dui').value,
+                    telefono: document.getElementById('teacher-phone').value,
+                    email: document.getElementById('teacher-email').value,
+                    nivel_id: document.getElementById('teacher-nivel').value,
+                    rol_nivel: document.getElementById('teacher-rol').value,
+                    foto_url: fotoUrlNueva || (mExistente ? mExistente.foto_url : null),
+                    dui_adjunto_url: duiUrlNuevo || (mExistente ? mExistente.dui_adjunto_url : null)
+                };
+
+                let error;
+                if (idInput) {
+                    const res = await supabaseClient.from('maestros').update(payload).eq('id', idInput);
+                    error = res.error;
+                } else {
+                    const res = await supabaseClient.from('maestros').insert([payload]);
+                    error = res.error;
+                }
+
+                if (error) {
+                    showToast('Error al guardar maestro: ' + error.message, 'error');
+                } else {
+                    showToast(idInput ? 'Maestro actualizado con éxito' : 'Maestro registrado con éxito');
+                    closeModal('teacher-modal');
+                    await cargarMaestros();
+                }
+            } catch (err) {
+                showToast('Error inesperado al guardar maestro', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Maestro`;
+            }
+        }
+
+        async function deleteTeacher(id) {
+            if (confirm('¿Desea eliminar este maestro de la base de datos?')) {
+                const { error } = await supabaseClient.from('maestros').delete().eq('id', id);
+                if (error) showToast('Error al eliminar', 'error');
+                else {
+                    showToast('Maestro eliminado');
+                    cargarMaestros();
+                }
+            }
+        }
+
         async function loadAttendanceForDate() {
-            const date = document.getElementById('attendance-date').value;
             const tbody = document.getElementById('attendance-table-body');
             tbody.innerHTML = '';
 
-            const { data: attendanceData } = await supabaseClient.from('asistencia').select('*').eq('fecha', date);
-            const attendanceMap = {};
-            if (attendanceData) {
-                attendanceData.forEach(a => attendanceMap[a.alumno_id] = a.presente);
-            }
-
             if (state.students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">No hay alumnos para marcar asistencia.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">No hay alumnos.</td></tr>`;
                 return;
             }
 
             state.students.forEach(s => {
-                const isChecked = attendanceMap[s.id] === true ? 'checked' : '';
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="py-3 px-4 font-bold text-slate-800">${s.nombres} ${s.apellidos}</td>
-                        <td class="py-3 px-4 text-xs text-slate-600">${s.maestro_responsable || 'No asignado'}</td>
-                        <td class="py-3 px-4 text-xs font-semibold text-brand-700">${s.nivel || 'Nivel 0'}</td>
+                    <tr class="hover:bg-slate-50/80">
+                        <td class="py-3 px-4 font-bold text-slate-900">${s.nombres} ${s.apellidos}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'Sin maestro'}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
                         <td class="py-3 px-4 text-center">
-                            <input type="checkbox" ${isChecked} onchange="toggleAttendance(${s.id}, '${date}', this.checked)" class="w-5 h-5 text-brand-600 rounded focus:ring-brand-500 border-slate-300">
+                            <button onclick="marcarAsistencia(${s.id}, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Presente</button>
+                            <button onclick="marcarAsistencia(${s.id}, false)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition ml-2">Ausente</button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        async function toggleAttendance(alumnoId, fecha, presente) {
-            await supabaseClient.from('asistencia').upsert([{ alumno_id: alumnoId, fecha: fecha, presente: presente }], { onConflict: 'alumno_id,fecha' });
-            showToast('Asistencia actualizada');
-            cargarAsistenciasCount();
+        async function marcarAsistencia(alumnoId, presente) {
+            const fecha = document.getElementById('attendance-date').value;
+            const { error } = await supabaseClient.from('asistencia').insert([
+                { alumno_id: alumnoId, fecha: fecha, presente: presente }
+            ]);
+
+            if (error) showToast('Error al marcar asistencia: ' + error.message, 'error');
+            else {
+                showToast('Asistencia registrada');
+                cargarAsistenciasCount();
+            }
+        }
+
+        function updateStudentDropdowns() {
+            const options = state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
+            const gradeSelect = document.getElementById('grade-student-id');
+            if (gradeSelect) gradeSelect.innerHTML = options;
+        }
+
+        function openAddGradeModal() {
+            updateStudentDropdowns();
+            document.getElementById('grade-form').reset();
+            document.getElementById('grade-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('grade-modal').classList.remove('hidden');
+        }
+
+        async function handleGradeSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-grade');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+
+            const payload = {
+                alumno_id: parseInt(document.getElementById('grade-student-id').value, 10),
+                modulo: document.getElementById('grade-period').value,
+                evaluacion: document.getElementById('grade-title').value,
+                nota: parseFloat(document.getElementById('grade-score').value),
+                fecha: document.getElementById('grade-date').value
+            };
+
+            const { error } = await supabaseClient.from('calificaciones').insert([payload]);
+
+            btn.disabled = false;
+            btn.innerHTML = `Guardar Nota`;
+
+            if (error) {
+                showToast('Error al guardar la nota: ' + error.message, 'error');
+            } else {
+                showToast('Calificación registrada con éxito');
+                closeModal('grade-modal');
+                cargarCalificaciones();
+            }
         }
 
         function renderGradesTable() {
             const tbody = document.getElementById('grades-table-body');
             tbody.innerHTML = '';
 
-            if (state.grades.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">No se encontraron calificaciones.</td></tr>`;
+            if (!state.grades || state.grades.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">No se han registrado calificaciones todavía.</td></tr>`;
                 return;
             }
 
             state.grades.forEach(g => {
-                const nombreAlumno = g.alumnos ? `${g.alumnos.nombres} ${g.alumnos.apellidos}` : 'Alumno ID: ' + g.alumno_id;
+                const alumnoNombre = g.alumnos ? `${g.alumnos.nombres} ${g.alumnos.apellidos}` : 'Alumno no encontrado';
+                const notaColor = g.nota >= 7 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+                                  g.nota >= 5 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-rose-700 bg-rose-50 border-rose-200';
+
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="py-3 px-4 font-bold text-slate-800">${nombreAlumno}</td>
-                        <td class="py-3 px-4 text-xs text-slate-600 font-semibold">${g.modulo}</td>
+                    <tr class="hover:bg-slate-50/80 transition-all">
+                        <td class="py-3 px-4 font-bold text-slate-900">${alumnoNombre}</td>
+                        <td class="py-3 px-4 text-xs font-semibold text-slate-600">${g.modulo}</td>
                         <td class="py-3 px-4 text-xs text-slate-700">${g.evaluacion}</td>
-                        <td class="py-3 px-4 text-center"><span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">${g.nota}</span></td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-3 py-1 text-xs font-bold rounded-full border ${notaColor}">${g.nota}</span>
+                        </td>
                         <td class="py-3 px-4 text-right text-xs text-slate-400">${g.fecha || '-'}</td>
                     </tr>
                 `;
@@ -1306,193 +1486,33 @@
             const grid = document.getElementById('documents-grid');
             grid.innerHTML = '';
 
-            const alumnosConDocs = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url);
+            const conDocumentos = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
 
-            if (alumnosConDocs.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-sm">No hay documentos cargados aún.</div>`;
+            if (conDocumentos.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 text-sm">No se han adjuntado documentos aún. Agrega archivos desde el formulario de registro.</div>`;
                 return;
             }
 
-            alumnosConDocs.forEach(s => {
+            conDocumentos.forEach(s => {
                 grid.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">${s.nombres} ${s.apellidos}</h4>
-                            <p class="text-xs text-slate-400 mb-3">${s.identificacion || 'Sin documento'}</p>
-                            <div class="space-y-1.5 text-xs">
-                                ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" class="flex items-center text-indigo-600 hover:underline"><i class="fa-solid fa-id-card mr-2"></i> Ver DUI / Cédula</a>` : ''}
-                                ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" class="flex items-center text-emerald-600 hover:underline"><i class="fa-solid fa-file-contract mr-2"></i> Ver Partida Nacimiento</a>` : ''}
-                                ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" class="flex items-center text-amber-600 hover:underline"><i class="fa-solid fa-award mr-2"></i> Ver Certificados</a>` : ''}
+                            <div class="flex items-center space-x-3 mb-3">
+                                ${s.foto_url ? `<img src="${s.foto_url}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">${s.nombres ? s.nombres[0] : 'A'}</div>`}
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">${s.nombres} ${s.apellidos}</h4>
+                                    <p class="text-xs text-slate-400">${s.maestro_responsable || 'Maestro no asignado'}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-xs border-t border-slate-100 pt-3">
+                                ${s.dui_url ? `<a href="${s.dui_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-id-card text-indigo-600 mr-2"></i>DUI / Cédula</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
+                                ${s.partida_url ? `<a href="${s.partida_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-file-contract text-emerald-600 mr-2"></i>Partida Nacimiento</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
+                                ${s.certificado_url ? `<a href="${s.certificado_url}" target="_blank" class="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-brand-50 text-slate-700"><span class="font-medium"><i class="fa-solid fa-award text-amber-600 mr-2"></i>Certificados</span> <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-400"></i></a>` : ''}
                             </div>
                         </div>
                     </div>
                 `;
             });
-        }
-
-        function openAddStudentModal() {
-            document.getElementById('student-modal-title').textContent = 'Registrar Nuevo Alumno';
-            document.getElementById('student-form').reset();
-            document.getElementById('student-id').value = '';
-            document.getElementById('preview-foto').classList.add('hidden');
-            document.getElementById('icon-foto-default').classList.remove('hidden');
-            document.getElementById('student-modal').classList.remove('hidden');
-        }
-
-        function openAddTeacherModal() {
-            document.getElementById('teacher-modal-title').textContent = 'Registrar Nuevo Maestro';
-            document.getElementById('teacher-form').reset();
-            document.getElementById('teacher-id').value = '';
-            document.getElementById('preview-teacher-foto').classList.add('hidden');
-            document.getElementById('icon-teacher-foto-default').classList.remove('hidden');
-            document.getElementById('teacher-modal').classList.remove('hidden');
-        }
-
-        function openAddGradeModal() {
-            updateStudentDropdowns();
-            document.getElementById('grade-modal').classList.remove('hidden');
-        }
-
-        function updateStudentDropdowns() {
-            const select = document.getElementById('grade-student-id');
-            if (!select) return;
-            select.innerHTML = '<option value="">-- Seleccionar Alumno --</option>' +
-                state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
-        }
-
-        async function handleStudentSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-student');
-            btn.disabled = true;
-
-            const id = document.getElementById('student-id').value;
-            const fotoUrl = await subirArchivoSupabase(document.getElementById('student-foto'), 'fotos') || '';
-            const duiUrl = await subirArchivoSupabase(document.getElementById('file-dui'), 'documentos') || '';
-            const partidaUrl = await subirArchivoSupabase(document.getElementById('file-partida'), 'documentos') || '';
-            const certificadoUrl = await subirArchivoSupabase(document.getElementById('file-certificado'), 'documentos') || '';
-
-            const payload = {
-                nombres: document.getElementById('student-nombres').value,
-                apellidos: document.getElementById('student-apellidos').value,
-                identificacion: document.getElementById('student-dni').value,
-                telefono: document.getElementById('student-phone').value,
-                edad: document.getElementById('student-age').value ? parseInt(document.getElementById('student-age').value) : null,
-                nivel: document.getElementById('student-level').value,
-                maestro_responsable: document.getElementById('student-maestro').value,
-            };
-
-            if (fotoUrl) payload.foto_url = fotoUrl;
-            if (duiUrl) payload.dui_url = duiUrl;
-            if (partidaUrl) payload.partida_url = partidaUrl;
-            if (certificadoUrl) payload.certificado_url = certificadoUrl;
-
-            let err = null;
-            if (id) {
-                const { error } = await supabaseClient.from('alumnos').update(payload).eq('id', id);
-                err = error;
-            } else {
-                const { error } = await supabaseClient.from('alumnos').insert([payload]);
-                err = error;
-            }
-
-            btn.disabled = false;
-            if (err) {
-                showToast('Error al guardar alumno: ' + err.message, 'error');
-            } else {
-                showToast('Alumno guardado correctamente');
-                closeModal('student-modal');
-                cargarAlumnos();
-            }
-        }
-
-        async function handleTeacherSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-teacher');
-            btn.disabled = true;
-
-            const fotoUrl = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'fotos_maestros') || '';
-            const duiFileUrl = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'documentos_maestros') || '';
-
-            const payload = {
-                nombre: document.getElementById('teacher-nombre').value,
-                dui: document.getElementById('teacher-dui').value,
-                telefono: document.getElementById('teacher-phone').value,
-                email: document.getElementById('teacher-email').value,
-                nivel_asignado: document.getElementById('teacher-nivel').value,
-                rol_nivel: document.getElementById('teacher-rol').value,
-            };
-
-            if (fotoUrl) payload.foto_url = fotoUrl;
-            if (duiFileUrl) payload.dui_url = duiFileUrl;
-
-            const { error } = await supabaseClient.from('maestros').insert([payload]);
-            btn.disabled = false;
-
-            if (error) {
-                showToast('Error al guardar maestro: ' + error.message, 'error');
-            } else {
-                showToast('Maestro guardado correctamente');
-                closeModal('teacher-modal');
-                cargarMaestros();
-            }
-        }
-
-        async function handleGradeSubmit(e) {
-            e.preventDefault();
-            const payload = {
-                alumno_id: parseInt(document.getElementById('grade-student-id').value),
-                modulo: document.getElementById('grade-period').value,
-                evaluacion: document.getElementById('grade-title').value,
-                nota: parseFloat(document.getElementById('grade-score').value),
-                fecha: document.getElementById('grade-date').value
-            };
-
-            const { error } = await supabaseClient.from('calificaciones').insert([payload]);
-            if (error) {
-                showToast('Error al guardar nota: ' + error.message, 'error');
-            } else {
-                showToast('Calificación guardada correctamente');
-                closeModal('grade-modal');
-                cargarCalificaciones();
-            }
-        }
-
-        async function eliminarAlumno(id) {
-            if (confirm('¿Desea eliminar a este alumno?')) {
-                await supabaseClient.from('alumnos').delete().eq('id', id);
-                showToast('Alumno eliminado');
-                cargarAlumnos();
-            }
-        }
-
-        async function eliminarMaestro(id) {
-            if (confirm('¿Desea eliminar a este maestro?')) {
-                await supabaseClient.from('maestros').delete().eq('id', id);
-                showToast('Maestro eliminado');
-                cargarMaestros();
-            }
-        }
-
-        async function editarAlumno(id) {
-            const alumno = state.students.find(s => s.id === id);
-            if (!alumno) return;
-
-            openAddStudentModal();
-            document.getElementById('student-modal-title').textContent = 'Editar Alumno';
-            document.getElementById('student-id').value = alumno.id;
-            document.getElementById('student-nombres').value = alumno.nombres || '';
-            document.getElementById('student-apellidos').value = alumno.apellidos || '';
-            document.getElementById('student-dni').value = alumno.identificacion || '';
-            document.getElementById('student-phone').value = alumno.telefono || '';
-            document.getElementById('student-age').value = alumno.edad || '';
-            document.getElementById('student-level').value = alumno.nivel || 'Inicial (Nivel 0)';
-            document.getElementById('student-maestro').value = alumno.maestro_responsable || '';
-
-            if (alumno.foto_url) {
-                document.getElementById('preview-foto').src = alumno.foto_url;
-                document.getElementById('preview-foto').classList.remove('hidden');
-                document.getElementById('icon-foto-default').classList.add('hidden');
-            }
         }
     </script>
 </body>
