@@ -302,7 +302,7 @@
                             <div class="space-y-3">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tema Impartido *</label>
-                                    <input type="text" id="bitacora-tema" required placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <input type="text" id="bitacora-tema" placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Actividades Realizadas</label>
@@ -889,7 +889,7 @@
             const nivelSeleccionado = document.getElementById('tracker-level-select').value;
             const fecha = document.getElementById('tracker-date-select').value;
 
-            // 1. Cargar Alumnos del Nivel
+            // 1. Cargar Alumnos del Nivel y sus Asistencias
             const alumnosNivel = state.students.filter(s => s.nivel === nivelSeleccionado);
             const tbodyAlumnos = document.getElementById('tracker-students-tbody');
             tbodyAlumnos.innerHTML = '';
@@ -921,28 +921,39 @@
                 });
             }
 
-            // 2. Cargar Maestros del Nivel
+            // 2. Cargar Maestros del Nivel y sus Asistencias
             const maestrosNivel = state.teachers.filter(m => m.nivel_asignado === nivelSeleccionado || m.nivel_id === nivelSeleccionado);
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
+
+            const { data: asistenciasMaestrosPrevias } = await supabaseClient
+                .from('asistencia_maestros')
+                .select('*')
+                .eq('fecha', fecha);
+
+            const mapAsistenciaMaestros = {};
+            if (asistenciasMaestrosPrevias) {
+                asistenciasMaestrosPrevias.forEach(m => mapAsistenciaMaestros[m.maestro_id] = m.presente);
+            }
 
             if (maestrosNivel.length === 0) {
                 containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros asignados a este nivel.</p>`;
             } else {
                 maestrosNivel.forEach(m => {
+                    const isChecked = mapAsistenciaMaestros[m.id] === true ? 'checked' : '';
                     containerMaestros.innerHTML += `
                         <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
                             <span class="font-bold text-slate-800">${m.nombre}</span>
-                            <label class="flex items-center space-x-2">
+                            <label class="flex items-center space-x-2 cursor-pointer">
                                 <span class="text-slate-500">Asistió</span>
-                                <input type="checkbox" data-maestro-id="${m.id}" class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
+                                <input type="checkbox" data-maestro-id="${m.id}" ${isChecked} class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
                             </label>
                         </div>
                     `;
                 });
             }
 
-            // Cargar datos previos de bitácora si existen
+            // 3. Cargar datos previos de bitácora si existen
             const { data: bitacoraData } = await supabaseClient
                 .from('bitacora_clases')
                 .select('*')
@@ -989,10 +1000,10 @@
                 });
 
                 if (registrosAlumnos.length > 0) {
-                    await supabaseClient.from('asistencia').upsert(registrosAlumnos);
+                    await supabaseClient.from('asistencia').upsert(registrosAlumnos, { onConflict: 'alumno_id,fecha' });
                 }
 
-                // 2. Guardar Asistencia de Maestros (si la tabla existe)
+                // 2. Guardar Asistencia de Maestros
                 const teacherCheckboxes = document.querySelectorAll('.teacher-checkbox');
                 const registrosMaestros = [];
                 teacherCheckboxes.forEach(cb => {
@@ -1004,29 +1015,27 @@
                 });
 
                 if (registrosMaestros.length > 0) {
-                    await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros);
+                    await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros, { onConflict: 'maestro_id,fecha' });
                 }
 
                 // 3. Guardar Bitácora / Avance Curricular
-                if (tema) {
-                    const actividades = document.getElementById('bitacora-actividades').value;
-                    const tarea = document.getElementById('bitacora-tarea').value;
+                const actividades = document.getElementById('bitacora-actividades').value;
+                const tarea = document.getElementById('bitacora-tarea').value;
 
-                    await supabaseClient.from('bitacora_clases').upsert([{
-                        fecha: fecha,
-                        nivel: nivel,
-                        tema: tema,
-                        actividades: actividades,
-                        tarea: tarea
-                    }], { onConflict: 'fecha,nivel' });
-                }
+                await supabaseClient.from('bitacora_clases').upsert([{
+                    fecha: fecha,
+                    nivel: nivel,
+                    tema: tema || '',
+                    actividades: actividades || '',
+                    tarea: tarea || ''
+                }], { onConflict: 'fecha,nivel' });
 
                 showToast('¡Información de la clase guardada exitosamente!');
                 cargarAsistenciasCount();
 
             } catch (err) {
                 console.error(err);
-                showToast('Se guardó la información con advertencias', 'success');
+                showToast('Error al guardar la información de la clase', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Guardar Información de la Clase</span>`;
@@ -1251,7 +1260,7 @@
         }
 
         async function toggleAttendance(alumnoId, fecha, presente) {
-            await supabaseClient.from('asistencia').upsert([{ alumno_id: alumnoId, fecha: fecha, presente: presente }]);
+            await supabaseClient.from('asistencia').upsert([{ alumno_id: alumnoId, fecha: fecha, presente: presente }], { onConflict: 'alumno_id,fecha' });
             showToast('Asistencia actualizada');
             cargarAsistenciasCount();
         }
