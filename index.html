@@ -623,7 +623,6 @@
                     <input type="text" id="teacher-direccion" placeholder="Calle / Av. / Colonia / Municipio..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
-                <!-- SECCIÓN: CAMPOS DE CONTRASEÑA HABILITADOS PERMANENTEMENTE -->
                 <div id="teacher-password-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1" id="label-teacher-pass">Contraseña *</label>
@@ -946,7 +945,8 @@
                 });
             }
 
-            const maestrosNivel = state.teachers.filter(m => m.nivel_id === nivelSeleccionado);
+            // CORRECCIÓN: Filtrar utilizando la columna 'nivel' de Supabase
+            const maestrosNivel = state.teachers.filter(m => m.nivel === nivelSeleccionado);
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
 
@@ -965,6 +965,22 @@
                     `;
                 });
             }
+
+            // Cargar datos de la bitácora si existen
+            const { data: bitacora } = await supabaseClient
+                .from('bitacora_clases')
+                .select('*')
+                .eq('nivel', nivelSeleccionado)
+                .eq('fecha', fecha)
+                .maybeSingle();
+
+            if (bitacora) {
+                document.getElementById('bitacora-tema').value = bitacora.tema || '';
+                document.getElementById('bitacora-actividades').value = bitacora.actividades || '';
+                document.getElementById('bitacora-tarea').value = bitacora.tarea || '';
+            } else {
+                document.getElementById('tracker-bitacora-form').reset();
+            }
         }
 
         async function guardarAsistenciaAlumnos() {
@@ -974,7 +990,7 @@
             const registros = [];
             checkboxes.forEach(cb => {
                 registros.push({
-                    alumno_id: parseInt(cb.getAttribute('data-alumno-id'), 10),
+                    alumno_id: String(cb.getAttribute('data-alumno-id')),
                     fecha: fecha,
                     presente: cb.checked
                 });
@@ -997,8 +1013,25 @@
 
         async function guardarBitacoraClase(e) {
             e.preventDefault();
-            showToast('Avance curricular y bitácora guardados');
-            document.getElementById('tracker-bitacora-form').reset();
+            const nivel = document.getElementById('tracker-level-select').value;
+            const fecha = document.getElementById('tracker-date-select').value;
+            const tema = document.getElementById('bitacora-tema').value;
+            const actividades = document.getElementById('bitacora-actividades').value;
+            const tarea = document.getElementById('bitacora-tarea').value;
+
+            const { error } = await supabaseClient.from('bitacora_clases').upsert([{
+                nivel: nivel,
+                fecha: fecha,
+                tema: tema,
+                actividades: actividades,
+                tarea: tarea
+            }], { onConflict: 'nivel,fecha' });
+
+            if (error) {
+                showToast('Error al guardar bitácora: ' + error.message, 'error');
+            } else {
+                showToast('Avance curricular y bitácora guardados en Supabase');
+            }
         }
 
         function previsualizarFoto(event) {
@@ -1095,7 +1128,7 @@
 
             const filtered = state.students.filter(s => 
                 `${s.nombres} ${s.apellidos}`.toLowerCase().includes(search) || 
-                (s.identificacion && s.identificacion.toLowerCase().includes(search)) ||
+                (s.documento && s.documento.toLowerCase().includes(search)) ||
                 (s.direccion && s.direccion.toLowerCase().includes(search)) ||
                 (s.maestro_responsable && s.maestro_responsable.toLowerCase().includes(search))
             );
@@ -1129,7 +1162,7 @@
                             </div>
                         </td>
                         <td class="py-3 px-4">
-                            <div class="text-slate-800 font-medium text-xs">${s.identificacion || 'Sin Documento'}</div>
+                            <div class="text-slate-800 font-medium text-xs">${s.documento || 'Sin Documento'}</div>
                             <div class="text-xs text-slate-400">${s.telefono || 'Sin Teléfono'}</div>
                         </td>
                         <td class="py-3 px-4 text-slate-700 text-xs">${s.direccion || 'Sin Dirección'}</td>
@@ -1165,7 +1198,7 @@
             document.getElementById('student-id').value = student.id;
             document.getElementById('student-nombres').value = student.nombres || '';
             document.getElementById('student-apellidos').value = student.apellidos || '';
-            document.getElementById('student-dni').value = student.identificacion || student.documento || '';
+            document.getElementById('student-dni').value = student.documento || '';
             document.getElementById('student-phone').value = student.telefono || '';
             document.getElementById('student-direccion').value = student.direccion || '';
             document.getElementById('student-age').value = student.edad || '';
@@ -1205,10 +1238,11 @@
                 const partidaUrlNueva = await subirArchivoSupabase(document.getElementById('file-partida'), 'partidas');
                 const certificadoUrlNuevo = await subirArchivoSupabase(document.getElementById('file-certificado'), 'certificados');
 
+                // CORRECCIÓN: Se envía 'documento' respetando el nombre exacto de la columna en Supabase
                 const payload = {
                     nombres: document.getElementById('student-nombres').value,
                     apellidos: document.getElementById('student-apellidos').value,
-                    identificacion: document.getElementById('student-dni').value,
+                    documento: document.getElementById('student-dni').value,
                     telefono: document.getElementById('student-phone').value,
                     direccion: document.getElementById('student-direccion').value,
                     edad: document.getElementById('student-age').value ? parseInt(document.getElementById('student-age').value, 10) : null,
@@ -1293,7 +1327,7 @@
                             <div class="text-xs text-slate-400">${m.telefono || 'Sin Teléfono'}</div>
                         </td>
                         <td class="py-3 px-4 text-slate-700 text-xs">${m.direccion || 'Sin Dirección'}</td>
-                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${m.nivel_id || 'Sin Asignar'}</td>
+                        <td class="py-3 px-4 text-slate-700 font-medium text-xs">${m.nivel || 'Sin Asignar'}</td>
                         <td class="py-3 px-4">
                             <span class="px-2.5 py-1 ${rolColor} rounded-lg text-xs font-semibold">${m.rol_nivel || 'Colaborador'}</span>
                         </td>
@@ -1335,7 +1369,7 @@
             document.getElementById('teacher-phone').value = m.telefono || '';
             document.getElementById('teacher-email').value = m.email || '';
             document.getElementById('teacher-direccion').value = m.direccion || '';
-            document.getElementById('teacher-nivel').value = m.nivel_id || 'Inicial (Nivel 0)';
+            document.getElementById('teacher-nivel').value = m.nivel || 'Inicial (Nivel 0)';
             document.getElementById('teacher-rol').value = m.rol_nivel || 'Colaborador';
 
             document.getElementById('label-teacher-pass').textContent = 'Nueva Contraseña (Opcional)';
@@ -1357,7 +1391,6 @@
             document.getElementById('teacher-modal').classList.remove('hidden');
         }
 
-        /* ----- FUNCIÓN CON PERMISO DE MODIFICACIÓN DE CONTRASEÑA EN SUPABASE ----- */
         async function handleTeacherSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-teacher');
@@ -1372,7 +1405,6 @@
                 const password = document.getElementById('teacher-password').value;
                 const passwordConfirm = document.getElementById('teacher-password-confirm').value;
 
-                // Validación de contraseñas si el usuario escribió una nueva
                 if (password || !idInput) {
                     if (!password || password.length < 6) {
                         showToast('La contraseña debe tener al menos 6 caracteres', 'error');
@@ -1389,7 +1421,6 @@
                 }
 
                 if (!idInput) {
-                    // Crear nuevo usuario en Supabase Auth
                     const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password
@@ -1402,7 +1433,6 @@
                         return;
                     }
                 } else if (password) {
-                    // Modificar contraseña en el cliente activo de Supabase si corresponde al usuario actual
                     const { error: passError } = await supabaseClient.auth.updateUser({ password: password });
                     if (passError) {
                         showToast('Aviso sobre la contraseña: ' + passError.message, 'error');
@@ -1411,18 +1441,17 @@
                     }
                 }
 
-                // Subida de imágenes
                 const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'maestros_fotos');
                 const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'maestros_duis');
 
-                // Aplicar los cambios directamente en la tabla 'maestros' de Supabase
+                // CORRECCIÓN: Se utiliza 'nivel' en lugar de 'nivel_id'
                 const payload = {
                     nombre: document.getElementById('teacher-nombre').value,
                     dui: document.getElementById('teacher-dui').value,
                     telefono: document.getElementById('teacher-phone').value,
                     email: email,
                     direccion: document.getElementById('teacher-direccion').value,
-                    nivel_id: document.getElementById('teacher-nivel').value,
+                    nivel: document.getElementById('teacher-nivel').value,
                     rol_nivel: document.getElementById('teacher-rol').value,
                     foto_url: fotoUrlNueva || (mExistente ? mExistente.foto_url : null),
                     dui_adjunto_url: duiUrlNuevo || (mExistente ? mExistente.dui_adjunto_url : null)
@@ -1490,7 +1519,7 @@
         async function marcarAsistencia(alumnoId, presente) {
             const fecha = document.getElementById('attendance-date').value;
             const { error } = await supabaseClient.from('asistencia').insert([
-                { alumno_id: alumnoId, fecha: fecha, presente: presente }
+                { alumno_id: String(alumnoId), fecha: fecha, presente: presente }
             ]);
 
             if (error) showToast('Error al marcar asistencia: ' + error.message, 'error');
