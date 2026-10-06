@@ -945,7 +945,6 @@
                 });
             }
 
-            // CORRECCIÓN: Filtrar utilizando la columna 'nivel' de Supabase
             const maestrosNivel = state.teachers.filter(m => m.nivel === nivelSeleccionado);
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
@@ -966,18 +965,18 @@
                 });
             }
 
-            // Cargar datos de la bitácora si existen
+            // Cargar bitácora correspondiente a la fecha y nivel seleccionados
             const { data: bitacora } = await supabaseClient
                 .from('bitacora_clases')
                 .select('*')
                 .eq('nivel', nivelSeleccionado)
                 .eq('fecha', fecha)
-                .maybeSingle();
+                .limit(1);
 
-            if (bitacora) {
-                document.getElementById('bitacora-tema').value = bitacora.tema || '';
-                document.getElementById('bitacora-actividades').value = bitacora.actividades || '';
-                document.getElementById('bitacora-tarea').value = bitacora.tarea || '';
+            if (bitacora && bitacora.length > 0) {
+                document.getElementById('bitacora-tema').value = bitacora[0].tema || '';
+                document.getElementById('bitacora-actividades').value = bitacora[0].actividades || '';
+                document.getElementById('bitacora-tarea').value = bitacora[0].tarea || '';
             } else {
                 document.getElementById('tracker-bitacora-form').reset();
             }
@@ -1019,18 +1018,34 @@
             const actividades = document.getElementById('bitacora-actividades').value;
             const tarea = document.getElementById('bitacora-tarea').value;
 
-            const { error } = await supabaseClient.from('bitacora_clases').upsert([{
-                nivel: nivel,
-                fecha: fecha,
-                tema: tema,
-                actividades: actividades,
-                tarea: tarea
-            }], { onConflict: 'nivel,fecha' });
+            // Verificar si ya existe un registro de avance para la fecha elegida
+            const { data: bitacoraExistente } = await supabaseClient
+                .from('bitacora_clases')
+                .select('id')
+                .eq('nivel', nivel)
+                .eq('fecha', fecha)
+                .limit(1);
+
+            let error;
+            if (bitacoraExistente && bitacoraExistente.length > 0) {
+                // Actualizar registro existente para la fecha
+                const res = await supabaseClient
+                    .from('bitacora_clases')
+                    .update({ tema, actividades, tarea })
+                    .eq('id', bitacoraExistente[0].id);
+                error = res.error;
+            } else {
+                // Insertar nueva bitácora histórica conservando la fecha
+                const res = await supabaseClient
+                    .from('bitacora_clases')
+                    .insert([{ nivel, fecha, tema, actividades, tarea }]);
+                error = res.error;
+            }
 
             if (error) {
                 showToast('Error al guardar bitácora: ' + error.message, 'error');
             } else {
-                showToast('Avance curricular y bitácora guardados en Supabase');
+                showToast('Avance curricular registrado exitosamente para la fecha ' + fecha);
             }
         }
 
@@ -1238,7 +1253,6 @@
                 const partidaUrlNueva = await subirArchivoSupabase(document.getElementById('file-partida'), 'partidas');
                 const certificadoUrlNuevo = await subirArchivoSupabase(document.getElementById('file-certificado'), 'certificados');
 
-                // CORRECCIÓN: Se envía 'documento' respetando el nombre exacto de la columna en Supabase
                 const payload = {
                     nombres: document.getElementById('student-nombres').value,
                     apellidos: document.getElementById('student-apellidos').value,
@@ -1444,7 +1458,6 @@
                 const fotoUrlNueva = await subirArchivoSupabase(document.getElementById('teacher-foto'), 'maestros_fotos');
                 const duiUrlNuevo = await subirArchivoSupabase(document.getElementById('teacher-dui-file'), 'maestros_duis');
 
-                // CORRECCIÓN: Se utiliza 'nivel' en lugar de 'nivel_id'
                 const payload = {
                     nombre: document.getElementById('teacher-nombre').value,
                     dui: document.getElementById('teacher-dui').value,
