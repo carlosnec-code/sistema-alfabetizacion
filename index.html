@@ -129,14 +129,6 @@
                     <i class="fa-solid fa-chalkboard-user"></i>
                     <span>Maestros</span>
                 </button>
-                <button onclick="switchTab('attendance')" id="nav-attendance" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span>Asistencia</span>
-                </button>
-                <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
-                    <i class="fa-solid fa-clipboard-list"></i>
-                    <span>Calificaciones</span>
-                </button>
                 <button onclick="switchTab('documents')" id="nav-documents" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-folder-open"></i>
                     <span>Documentos</span>
@@ -395,70 +387,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: ATTENDANCE -->
-            <div id="tab-attendance" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <label for="attendance-date" class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Fecha:</label>
-                        <input type="date" id="attendance-date" onchange="loadAttendanceForDate()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Alumno</th>
-                                    <th class="py-3 px-4">Maestro Responsable</th>
-                                    <th class="py-3 px-4">Nivel</th>
-                                    <th class="py-3 px-4 text-center">Marcar Asistencia</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-table-body" class="divide-y divide-slate-100">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 5: GRADES -->
-            <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-4">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Filtrar Módulo:</label>
-                        <select id="grade-period-select" onchange="cargarCalificaciones()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                            <option value="TODOS">Todos los Módulos</option>
-                            <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
-                            <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
-                            <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
-                        </select>
-                    </div>
-                    <button onclick="openAddGradeModal()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Registrar Nueva Nota</span>
-                    </button>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th class="py-3 px-4">Alumno</th>
-                                    <th class="py-3 px-4">Módulo</th>
-                                    <th class="py-3 px-4">Evaluación</th>
-                                    <th class="py-3 px-4 text-center">Calificación (0 - 10)</th>
-                                    <th class="py-3 px-4 text-right">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody id="grades-table-body" class="divide-y divide-slate-100">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
             <!-- TAB 6: DOCUMENTS -->
             <div id="tab-documents" class="tab-content hidden flex-1 flex flex-col space-y-4">
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -670,48 +598,6 @@
         </div>
     </div>
 
-    <!-- MODAL: REGISTRAR NOTA -->
-    <div id="grade-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 class="text-base font-bold text-slate-900">Registrar Calificación</h3>
-                <button onclick="closeModal('grade-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form id="grade-form" onsubmit="handleGradeSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Alumno *</label>
-                    <select id="grade-student-id" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Módulo *</label>
-                    <select id="grade-period" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="Modulo 1">Módulo 1: Vocales y Consonantes Básicas</option>
-                        <option value="Modulo 2">Módulo 2: Lectura y Escritura de Oraciones</option>
-                        <option value="Modulo 3">Módulo 3: Matemática Elemental</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre de Evaluación *</label>
-                    <input type="text" id="grade-title" required placeholder="Ej. Lectura de sílabas" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Calificación (0 - 10) *</label>
-                        <input type="number" id="grade-score" step="0.1" min="0" max="10" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha</label>
-                        <input type="date" id="grade-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('grade-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs">Cancelar</button>
-                    <button type="submit" id="btn-submit-grade" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs shadow-sm">Guardar Nota</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
@@ -721,10 +607,9 @@
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let state = { students: [], teachers: [], countAsistencias: 0, grades: [] };
+        let state = { students: [], teachers: [], countAsistencias: 0 };
 
         window.onload = async function() {
-            document.getElementById('attendance-date').valueAsDate = new Date();
             document.getElementById('tracker-date-select').valueAsDate = new Date();
             validarFechaLunesMartes();
 
@@ -790,7 +675,6 @@
             await cargarMaestros();
             await cargarAlumnos();
             await cargarAsistenciasCount();
-            await cargarCalificaciones();
             renderDashboard();
         }
 
@@ -824,7 +708,6 @@
                 state.students = data;
                 renderStudentsTable();
                 renderDocumentsGrid();
-                updateStudentDropdowns();
             }
         }
 
@@ -832,21 +715,6 @@
             const { count, error } = await supabaseClient.from('asistencia').select('*', { count: 'exact', head: true });
             if (!error && count !== null) {
                 state.countAsistencias = count;
-            }
-        }
-
-        async function cargarCalificaciones() {
-            const moduloFiltro = document.getElementById('grade-period-select') ? document.getElementById('grade-period-select').value : 'TODOS';
-            let query = supabaseClient.from('calificaciones').select('*, alumnos(nombres, apellidos)').order('fecha', { ascending: false });
-
-            if (moduloFiltro && moduloFiltro !== 'TODOS') {
-                query = query.eq('modulo', moduloFiltro);
-            }
-
-            const { data, error } = await query;
-            if (!error && data) {
-                state.grades = data;
-                renderGradesTable();
             }
         }
 
@@ -866,8 +734,6 @@
             if (tabId === 'level-tracker') cargarSeguimientoNivel();
             if (tabId === 'students') renderStudentsTable();
             if (tabId === 'teachers') renderTeachersTable();
-            if (tabId === 'attendance') loadAttendanceForDate();
-            if (tabId === 'grades') cargarCalificaciones();
             if (tabId === 'documents') renderDocumentsGrid();
         }
 
@@ -965,7 +831,6 @@
                 });
             }
 
-            // Cargar bitácora correspondiente a la fecha y nivel seleccionados
             const { data: bitacora } = await supabaseClient
                 .from('bitacora_clases')
                 .select('*')
@@ -1018,7 +883,6 @@
             const actividades = document.getElementById('bitacora-actividades').value;
             const tarea = document.getElementById('bitacora-tarea').value;
 
-            // Verificar si ya existe un registro de avance para la fecha elegida
             const { data: bitacoraExistente } = await supabaseClient
                 .from('bitacora_clases')
                 .select('id')
@@ -1028,14 +892,12 @@
 
             let error;
             if (bitacoraExistente && bitacoraExistente.length > 0) {
-                // Actualizar registro existente para la fecha
                 const res = await supabaseClient
                     .from('bitacora_clases')
                     .update({ tema, actividades, tarea })
                     .eq('id', bitacoraExistente[0].id);
                 error = res.error;
             } else {
-                // Insertar nueva bitácora histórica conservando la fecha
                 const res = await supabaseClient
                     .from('bitacora_clases')
                     .insert([{ nivel, fecha, tema, actividades, tarea }]);
@@ -1503,112 +1365,6 @@
                     cargarMaestros();
                 }
             }
-        }
-
-        async function loadAttendanceForDate() {
-            const tbody = document.getElementById('attendance-table-body');
-            tbody.innerHTML = '';
-
-            if (state.students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-sm">No hay alumnos.</td></tr>`;
-                return;
-            }
-
-            state.students.forEach(s => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80">
-                        <td class="py-3 px-4 font-bold text-slate-900">${s.nombres} ${s.apellidos}</td>
-                        <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'Sin maestro'}</td>
-                        <td class="py-3 px-4"><span class="px-2 py-1 bg-brand-50 text-brand-700 rounded-lg text-xs font-semibold">${s.nivel || 'Inicial (Nivel 0)'}</span></td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="marcarAsistencia(${s.id}, true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">Presente</button>
-                            <button onclick="marcarAsistencia(${s.id}, false)" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition ml-2">Ausente</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function marcarAsistencia(alumnoId, presente) {
-            const fecha = document.getElementById('attendance-date').value;
-            const { error } = await supabaseClient.from('asistencia').insert([
-                { alumno_id: String(alumnoId), fecha: fecha, presente: presente }
-            ]);
-
-            if (error) showToast('Error al marcar asistencia: ' + error.message, 'error');
-            else {
-                showToast('Asistencia registrada');
-                cargarAsistenciasCount();
-            }
-        }
-
-        function updateStudentDropdowns() {
-            const options = state.students.map(s => `<option value="${s.id}">${s.nombres} ${s.apellidos}</option>`).join('');
-            const gradeSelect = document.getElementById('grade-student-id');
-            if (gradeSelect) gradeSelect.innerHTML = options;
-        }
-
-        function openAddGradeModal() {
-            updateStudentDropdowns();
-            document.getElementById('grade-form').reset();
-            document.getElementById('grade-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('grade-modal').classList.remove('hidden');
-        }
-
-        async function handleGradeSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-grade');
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
-
-            const payload = {
-                alumno_id: parseInt(document.getElementById('grade-student-id').value, 10),
-                modulo: document.getElementById('grade-period').value,
-                evaluacion: document.getElementById('grade-title').value,
-                nota: parseFloat(document.getElementById('grade-score').value),
-                fecha: document.getElementById('grade-date').value
-            };
-
-            const { error } = await supabaseClient.from('calificaciones').insert([payload]);
-
-            btn.disabled = false;
-            btn.innerHTML = `Guardar Nota`;
-
-            if (error) {
-                showToast('Error al guardar la nota: ' + error.message, 'error');
-            } else {
-                showToast('Calificación registrada con éxito');
-                closeModal('grade-modal');
-                cargarCalificaciones();
-            }
-        }
-
-        function renderGradesTable() {
-            const tbody = document.getElementById('grades-table-body');
-            tbody.innerHTML = '';
-
-            if (!state.grades || state.grades.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">No se han registrado calificaciones todavía.</td></tr>`;
-                return;
-            }
-
-            state.grades.forEach(g => {
-                const alumnoNombre = g.alumnos ? `${g.alumnos.nombres} ${g.alumnos.apellidos}` : 'Alumno no encontrado';
-                const notaColor = g.nota >= 7 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
-                                  g.nota >= 5 ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-rose-700 bg-rose-50 border-rose-200';
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/80 transition-all">
-                        <td class="py-3 px-4 font-bold text-slate-900">${alumnoNombre}</td>
-                        <td class="py-3 px-4 text-xs font-semibold text-slate-600">${g.modulo}</td>
-                        <td class="py-3 px-4 text-xs text-slate-700">${g.evaluacion}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="px-3 py-1 text-xs font-bold rounded-full border ${notaColor}">${g.nota}</span>
-                        </td>
-                        <td class="py-3 px-4 text-right text-xs text-slate-400">${g.fecha || '-'}</td>
-                    </tr>
-                `;
-            });
         }
 
         function renderDocumentsGrid() {
