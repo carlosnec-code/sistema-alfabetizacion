@@ -602,10 +602,13 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
     <script>
-        const SUPABASE_URL = "https://cegulltqwhgovouncvfc.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB";
+        // CONFIGURACIÓN DE PARÁMETROS Y SUPABASE
+        const CONFIG = {
+            SUPABASE_URL: "https://cegulltqwhgovouncvfc.supabase.co",
+            SUPABASE_KEY: "sb_publishable_H5f5I2xa7o--Mun2VOvtAw_ziWidTDB"
+        };
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
         let state = { students: [], teachers: [], countAsistencias: 0 };
 
