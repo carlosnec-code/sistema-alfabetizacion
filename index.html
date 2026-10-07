@@ -215,14 +215,14 @@
                 </div>
             </div>
 
-            <!-- TAB: SEGUIMIENTO POR NIVEL -->
+            <!-- TAB: SEGUIMIENTO POR NIVEL (FLUJO UNIFICADO) -->
             <div id="tab-level-tracker" class="tab-content hidden flex-1 flex flex-col space-y-6">
-                <!-- Filtros Principales -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                        <div>
+                <!-- Filtros Principales y Botón Único -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                        <div class="w-full sm:w-auto">
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Seleccionar Nivel:</label>
-                            <select id="tracker-level-select" onchange="cargarSeguimientoNivel()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <select id="tracker-level-select" onchange="cargarSeguimientoNivel()" class="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
                                 <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                                 <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
@@ -230,30 +230,33 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fecha de Clase (Lunes/Martes):</label>
-                            <input type="date" id="tracker-date-select" onchange="validarFechaLunesMartes(); cargarSeguimientoNivel();" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <div class="w-full sm:w-auto">
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fecha de Clase:</label>
+                            <input type="date" id="tracker-date-select" onchange="validarFechaLunesMartes(); cargarSeguimientoNivel();" class="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+
+                        <div id="tracker-day-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 self-stretch sm:self-auto flex items-center justify-center">
+                            Clase de Lunes / Martes
                         </div>
                     </div>
 
-                    <div id="tracker-day-badge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                        Clase de Lunes / Martes
-                    </div>
+                    <!-- Botón Unificado de Guardado -->
+                    <button id="btn-save-full-form" onclick="guardarFormularioCompleto()" class="w-full lg:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 shrink-0">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Guardar Formulario Completo</span>
+                    </button>
                 </div>
 
-                <!-- Contenido Principal: Asistencias y Avance -->
+                <!-- Contenido Principal: Asistencias y Avance (Planilla Unificada) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
                     <!-- Columna Izquierda: Asistencia de Alumnos -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
                                 <i class="fa-solid fa-user-check text-brand-600 mr-2"></i> Asistencia de Alumnos
                             </h3>
-                            <button onclick="guardarAsistenciaAlumnos()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-1.5 px-3 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-1">
-                                <i class="fa-solid fa-floppy-disk"></i>
-                                <span>Guardar Cambios</span>
-                            </button>
+                            <span class="text-xs text-slate-400 font-medium">Marcado = Presente</span>
                         </div>
 
                         <div class="overflow-x-auto flex-1">
@@ -275,13 +278,11 @@
                     <div class="space-y-6">
                         <!-- Asistencia Maestros -->
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <div class="flex justify-between items-center mb-3">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                                 <h3 class="text-sm font-bold text-slate-900 flex items-center">
                                     <i class="fa-solid fa-chalkboard-user text-indigo-600 mr-2"></i> Asistencia Maestros
                                 </h3>
-                                <button onclick="guardarAsistenciaMaestros()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1 px-2.5 rounded-lg text-xs transition-all shadow-sm">
-                                    Guardar
-                                </button>
+                                <span class="text-xs text-slate-400 font-medium">Docentes del nivel</span>
                             </div>
                             <div id="tracker-teachers-list" class="space-y-2">
                             </div>
@@ -289,26 +290,23 @@
 
                         <!-- Bitácora de Clase -->
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center">
+                            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center border-b border-slate-100 pb-2">
                                 <i class="fa-solid fa-book-bookmark text-amber-600 mr-2"></i> Registro de Clase / Avance
                             </h3>
-                            <form id="tracker-bitacora-form" onsubmit="guardarBitacoraClase(event)" class="space-y-3">
+                            <div class="space-y-3">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tema Impartido</label>
-                                    <input type="text" id="bitacora-tema" required placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <input type="text" id="bitacora-tema" placeholder="Ej. Sílabas ma, me, mi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Actividades Realizadas</label>
-                                    <textarea id="bitacora-actividades" rows="2" placeholder="Ej. Ejercicios de trazo en libreta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                                    <textarea id="bitacora-actividades" rows="2" placeholder="Ej. Ejercicios de trazo en libreta..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tarea Asignada</label>
-                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
-                                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 rounded-xl text-xs transition-all">
-                                    Registrar Avance
-                                </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
@@ -769,39 +767,41 @@
 
             if (dayNum === 1) {
                 badge.textContent = "Clase de Lunes";
-                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 self-stretch sm:self-auto flex items-center justify-center";
             } else if (dayNum === 2) {
                 badge.textContent = "Clase de Martes";
-                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 self-stretch sm:self-auto flex items-center justify-center";
             } else {
                 badge.textContent = "Día fuera de horario (Solo Lunes/Martes)";
-                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 self-stretch sm:self-auto flex items-center justify-center";
             }
         }
 
+        // 1. CARGA INTELIGENTE DE DATOS UNIFICADA
         async function cargarSeguimientoNivel() {
             const nivelSeleccionado = document.getElementById('tracker-level-select').value;
             const fecha = document.getElementById('tracker-date-select').value;
 
+            // --- A) ALUMNOS ---
             const alumnosNivel = state.students.filter(s => s.nivel === nivelSeleccionado);
             const tbodyAlumnos = document.getElementById('tracker-students-tbody');
             tbodyAlumnos.innerHTML = '';
 
-            const { data: asistenciasPrevias } = await supabaseClient
+            const { data: asistenciasAlumnos } = await supabaseClient
                 .from('asistencia')
                 .select('*')
                 .eq('fecha', fecha);
 
-            const mapAsistencia = {};
-            if (asistenciasPrevias) {
-                asistenciasPrevias.forEach(a => mapAsistencia[a.alumno_id] = a.presente);
+            const mapAsistenciaAlumnos = {};
+            if (asistenciasAlumnos) {
+                asistenciasAlumnos.forEach(a => mapAsistenciaAlumnos[a.alumno_id] = a.presente);
             }
 
             if (alumnosNivel.length === 0) {
                 tbodyAlumnos.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivelSeleccionado}</td></tr>`;
             } else {
                 alumnosNivel.forEach(s => {
-                    const isChecked = mapAsistencia[s.id] === true ? 'checked' : '';
+                    const isChecked = mapAsistenciaAlumnos[s.id] === true ? 'checked' : '';
                     tbodyAlumnos.innerHTML += `
                         <tr class="hover:bg-slate-50">
                             <td class="py-2.5 px-3 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
@@ -814,26 +814,42 @@
                 });
             }
 
+            // --- B) MAESTROS ---
             const maestrosNivel = state.teachers.filter(m => m.nivel === nivelSeleccionado);
             const containerMaestros = document.getElementById('tracker-teachers-list');
             containerMaestros.innerHTML = '';
+
+            const { data: asistenciasMaestros } = await supabaseClient
+                .from('asistencia_maestros')
+                .select('*')
+                .eq('fecha', fecha);
+
+            const mapAsistenciaMaestros = {};
+            if (asistenciasMaestros) {
+                asistenciasMaestros.forEach(m => mapAsistenciaMaestros[m.maestro_id] = m.presente);
+            }
 
             if (maestrosNivel.length === 0) {
                 containerMaestros.innerHTML = `<p class="text-xs text-slate-400 py-2">No hay maestros asignados a este nivel.</p>`;
             } else {
                 maestrosNivel.forEach(m => {
+                    const isChecked = mapAsistenciaMaestros[m.id] === true ? 'checked' : '';
                     containerMaestros.innerHTML += `
-                        <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                            <span class="font-bold text-slate-800">${m.nombre}</span>
-                            <label class="flex items-center space-x-2">
-                                <span class="text-slate-500">Asistió</span>
-                                <input type="checkbox" data-maestro-id="${m.id}" class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300">
+                        <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                            <div>
+                                <div class="font-bold text-slate-800">${m.nombre}</div>
+                                <div class="text-[10px] text-slate-400">${m.rol_nivel || 'Docente'}</div>
+                            </div>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <span class="text-slate-500 font-medium">Asistió</span>
+                                <input type="checkbox" data-maestro-id="${m.id}" ${isChecked} class="teacher-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
                             </label>
                         </div>
                     `;
                 });
             }
 
+            // --- C) BITÁCORA DE CLASE ---
             const { data: bitacora } = await supabaseClient
                 .from('bitacora_clases')
                 .select('*')
@@ -842,75 +858,94 @@
                 .limit(1);
 
             if (bitacora && bitacora.length > 0) {
-                document.getElementById('bitacora-tema').value = bitacora[0].tema || '';
+                document.getElementById('bitacora-tema').value = bitacora[0].tema_impartido || bitacora[0].tema || '';
                 document.getElementById('bitacora-actividades').value = bitacora[0].actividades || '';
                 document.getElementById('bitacora-tarea').value = bitacora[0].tarea || '';
             } else {
-                document.getElementById('tracker-bitacora-form').reset();
+                document.getElementById('bitacora-tema').value = '';
+                document.getElementById('bitacora-actividades').value = '';
+                document.getElementById('bitacora-tarea').value = '';
             }
         }
 
-        async function guardarAsistenciaAlumnos() {
-            const fecha = document.getElementById('tracker-date-select').value;
-            const checkboxes = document.querySelectorAll('.student-checkbox');
-            
-            const registros = [];
-            checkboxes.forEach(cb => {
-                registros.push({
-                    alumno_id: String(cb.getAttribute('data-alumno-id')),
-                    fecha: fecha,
-                    presente: cb.checked
+        // 2. BOTÓN ÚNICO DE GUARDADO ("Guardar Formulario Completo")
+        async function guardarFormularioCompleto() {
+            const btn = document.getElementById('btn-save-full-form');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Guardando Todo...</span>`;
+
+            try {
+                const nivel = document.getElementById('tracker-level-select').value;
+                const fecha = document.getElementById('tracker-date-select').value;
+
+                if (!fecha) {
+                    showToast('Por favor selecciona una fecha válida', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                    return;
+                }
+
+                // 1. Guardar Asistencia Alumnos (Upsert)
+                const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+                const registrosAlumnos = [];
+                studentCheckboxes.forEach(cb => {
+                    registrosAlumnos.push({
+                        alumno_id: String(cb.getAttribute('data-alumno-id')),
+                        fecha: fecha,
+                        presente: cb.checked
+                    });
                 });
-            });
 
-            if (registros.length === 0) return;
+                if (registrosAlumnos.length > 0) {
+                    const { error: errAlumnos } = await supabaseClient.from('asistencia').upsert(registrosAlumnos, { onConflict: 'alumno_id,fecha' });
+                    if (errAlumnos) throw new Error('Asistencia alumnos: ' + errAlumnos.message);
+                }
 
-            const { error } = await supabaseClient.from('asistencia').upsert(registros);
-            if (error) {
-                showToast('Error al guardar asistencias: ' + error.message, 'error');
-            } else {
-                showToast('Asistencias de alumnos guardadas correctamente');
+                // 2. Guardar Asistencia Maestros (Upsert)
+                const teacherCheckboxes = document.querySelectorAll('.teacher-checkbox');
+                const registrosMaestros = [];
+                teacherCheckboxes.forEach(cb => {
+                    registrosMaestros.push({
+                        maestro_id: String(cb.getAttribute('data-maestro-id')),
+                        fecha: fecha,
+                        presente: cb.checked
+                    });
+                });
+
+                if (registrosMaestros.length > 0) {
+                    const { error: errMaestros } = await supabaseClient.from('asistencia_maestros').upsert(registrosMaestros, { onConflict: 'maestro_id,fecha' });
+                    if (errMaestros) throw new Error('Asistencia maestros: ' + errMaestros.message);
+                }
+
+                // 3. Guardar Bitácora de Clases (Upsert)
+                const tema = document.getElementById('bitacora-tema').value;
+                const actividades = document.getElementById('bitacora-actividades').value;
+                const tarea = document.getElementById('bitacora-tarea').value;
+
+                const payloadBitacora = {
+                    nivel: nivel,
+                    fecha: fecha,
+                    tema_impartido: tema,
+                    actividades: actividades,
+                    tarea: tarea
+                };
+
+                const { error: errBitacora } = await supabaseClient
+                    .from('bitacora_clases')
+                    .upsert(payloadBitacora, { onConflict: 'nivel,fecha' });
+
+                if (errBitacora) throw new Error('Bitácora: ' + errBitacora.message);
+
+                showToast('¡Planilla del nivel guardada exitosamente!');
                 cargarAsistenciasCount();
-            }
-        }
 
-        async function guardarAsistenciaMaestros() {
-            showToast('Asistencia de maestros actualizada');
-        }
-
-        async function guardarBitacoraClase(e) {
-            e.preventDefault();
-            const nivel = document.getElementById('tracker-level-select').value;
-            const fecha = document.getElementById('tracker-date-select').value;
-            const tema = document.getElementById('bitacora-tema').value;
-            const actividades = document.getElementById('bitacora-actividades').value;
-            const tarea = document.getElementById('bitacora-tarea').value;
-
-            const { data: bitacoraExistente } = await supabaseClient
-                .from('bitacora_clases')
-                .select('id')
-                .eq('nivel', nivel)
-                .eq('fecha', fecha)
-                .limit(1);
-
-            let error;
-            if (bitacoraExistente && bitacoraExistente.length > 0) {
-                const res = await supabaseClient
-                    .from('bitacora_clases')
-                    .update({ tema, actividades, tarea })
-                    .eq('id', bitacoraExistente[0].id);
-                error = res.error;
-            } else {
-                const res = await supabaseClient
-                    .from('bitacora_clases')
-                    .insert([{ nivel, fecha, tema, actividades, tarea }]);
-                error = res.error;
-            }
-
-            if (error) {
-                showToast('Error al guardar bitácora: ' + error.message, 'error');
-            } else {
-                showToast('Avance curricular registrado exitosamente para la fecha ' + fecha);
+            } catch (err) {
+                console.error(err);
+                showToast('Error al guardar: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
             }
         }
 
