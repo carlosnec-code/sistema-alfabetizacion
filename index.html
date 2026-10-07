@@ -121,6 +121,10 @@
                     <i class="fa-solid fa-layer-group"></i>
                     <span>Seguimiento Nivel</span>
                 </button>
+                <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Notas / Tareas</span>
+                </button>
                 <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-users"></i>
                     <span>Alumnos</span>
@@ -243,7 +247,7 @@
                     <!-- Botón Unificado de Guardado -->
                     <button id="btn-save-full-form" onclick="guardarFormularioCompleto()" class="w-full lg:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 shrink-0">
                         <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Guardar Seguimiento</span>
+                        <span>Guardar Formulario Completo</span>
                     </button>
                 </div>
 
@@ -310,6 +314,67 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            <!-- TAB NUEVA: NOTAS DE ALUMNOS -->
+            <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-6">
+                <!-- Barra superior de filtros y acciones -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel:</label>
+                            <select id="grades-level-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
+                                <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
+                                <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
+                                <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Módulo / Asignatura:</label>
+                            <select id="grades-module-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="Lectoescritura">Lectoescritura</option>
+                                <option value="Matemáticas Básicas">Matemáticas Básicas</option>
+                                <option value="Ciencias y Entorno">Ciencias y Entorno</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                        <button onclick="openAddEvaluationModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2 px-4 rounded-xl text-xs transition-all border border-indigo-200 flex items-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Nueva Tarea/Evaluación</span>
+                        </button>
+                        <button id="btn-save-grades" onclick="guardarNotas()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-5 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Guardar Calificaciones</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla Planilla de Calificaciones (Matriz) -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                            <i class="fa-solid fa-table-cells text-brand-600 mr-2"></i> Planilla de Calificaciones del Nivel
+                        </h3>
+                        <span class="text-xs text-slate-400">Escala de 0 a 10 (Promedio automático)</span>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr id="grades-table-header" class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Alumno</th>
+                                    <!-- Columnas de evaluaciones generadas dinámicamente -->
+                                    <th class="py-3 px-4 text-center">Promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-table-body" class="divide-y divide-slate-100">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -395,6 +460,46 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- MODAL: CREAR NUEVA ACTIVIDAD / EVALUACIÓN -->
+    <div id="evaluation-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-900">Agregar Nueva Actividad</h3>
+                <button onclick="closeModal('evaluation-modal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <form id="evaluation-form" onsubmit="handleEvaluationSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre de la Actividad / Tarea *</label>
+                    <input type="text" id="eval-nombre" required placeholder="Ej. Tarea 1, Examen Parcial" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Actividad</label>
+                    <select id="eval-tipo" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Tarea">Tarea / Ejercicio</option>
+                        <option value="Actividad">Actividad Corta</option>
+                        <option value="Examen">Examen / Evaluación</option>
+                        <option value="Proyecto">Proyecto Final</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha</label>
+                    <input type="date" id="eval-fecha" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('evaluation-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl text-xs">Cancelar</button>
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2 px-5 rounded-xl text-xs shadow-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Agregar Columna</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- MODAL: REGISTRAR / EDITAR ALUMNO -->
@@ -608,7 +713,7 @@
 
         const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-        let state = { students: [], teachers: [], countAsistencias: 0 };
+        let state = { students: [], teachers: [], countAsistencias: 0, currentEvaluations: ["Tarea 1", "Tarea 2", "Examen Parcial"] };
 
         window.onload = async function() {
             document.getElementById('tracker-date-select').valueAsDate = new Date();
@@ -733,6 +838,7 @@
 
             if (tabId === 'dashboard') renderDashboard();
             if (tabId === 'level-tracker') cargarSeguimientoNivel();
+            if (tabId === 'grades') cargarMatrizNotas();
             if (tabId === 'students') renderStudentsTable();
             if (tabId === 'teachers') renderTeachersTable();
             if (tabId === 'documents') renderDocumentsGrid();
@@ -776,6 +882,187 @@
                 badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 self-stretch sm:self-auto flex items-center justify-center";
             }
         }
+
+        // -------------------------------------------------------------
+        // LÓGICA DEL MÓDULO DE NOTAS / CALIFICACIONES
+        // -------------------------------------------------------------
+        async function cargarMatrizNotas() {
+            const nivel = document.getElementById('grades-level-select').value;
+            const modulo = document.getElementById('grades-module-select').value;
+
+            const alumnosNivel = state.students.filter(s => s.nivel === nivel);
+
+            // Obtener todas las calificaciones guardadas para este módulo
+            const { data: notasDB } = await supabaseClient
+                .from('calificaciones')
+                .select('*')
+                .eq('modulo', modulo);
+
+            // Descubrir qué actividades existen registradas en Supabase para este módulo
+            const evaluacionesUnicas = new Set(state.currentEvaluations);
+            if (notasDB) {
+                notasDB.forEach(n => evaluacionesUnicas.add(n.evaluacion));
+            }
+            const evalList = Array.from(evaluacionesUnicas);
+
+            // Mapa para rápida consulta [alumno_id][evaluacion] = nota
+            const mapNotas = {};
+            if (notasDB) {
+                notasDB.forEach(n => {
+                    if (!mapNotas[n.alumno_id]) mapNotas[n.alumno_id] = {};
+                    mapNotas[n.alumno_id][n.evaluacion] = n.nota;
+                });
+            }
+
+            // Render Cabecera de la tabla
+            const headerRow = document.getElementById('grades-table-header');
+            headerRow.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
+            evalList.forEach(ev => {
+                headerRow.innerHTML += `<th class="py-3 px-3 text-center font-semibold text-slate-600">${ev}</th>`;
+            });
+            headerRow.innerHTML += `<th class="py-3 px-4 text-center font-bold text-brand-700">Promedio</th>`;
+
+            // Render Filas de Alumnos
+            const tbody = document.getElementById('grades-table-body');
+            tbody.innerHTML = '';
+
+            if (alumnosNivel.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${evalList.length + 2}" class="py-8 text-center text-slate-400 text-sm">No hay alumnos en ${nivel}</td></tr>`;
+                return;
+            }
+
+            alumnosNivel.forEach(s => {
+                let inputsHtml = '';
+                evalList.forEach(ev => {
+                    const valNota = (mapNotas[s.id] && mapNotas[s.id][ev] !== undefined && mapNotas[s.id][ev] !== null) ? mapNotas[s.id][ev] : '';
+                    inputsHtml += `
+                        <td class="py-2.5 px-2 text-center">
+                            <input type="number" step="0.1" min="0" max="10" 
+                                data-alumno-id="${s.id}" 
+                                data-evaluacion="${ev}" 
+                                value="${valNota}" 
+                                oninput="calcularPromedioFila(this)" 
+                                placeholder="-" 
+                                class="grade-input w-16 bg-slate-50 border border-slate-200 text-center rounded-lg py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white">
+                        </td>
+                    `;
+                });
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition-all" id="student-row-${s.id}">
+                        <td class="py-3 px-4 font-semibold text-slate-900">${s.nombres} ${s.apellidos}</td>
+                        ${inputsHtml}
+                        <td class="py-3 px-4 text-center">
+                            <span class="row-promedio font-bold text-sm text-brand-700 bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200">-</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Re-calcular promedios iniciales
+            alumnosNivel.forEach(s => {
+                const fila = document.getElementById(`student-row-${s.id}`);
+                if (fila) {
+                    const primerInput = fila.querySelector('.grade-input');
+                    if (primerInput) calcularPromedioFila(primerInput);
+                }
+            });
+        }
+
+        function calcularPromedioFila(inputElem) {
+            const fila = inputElem.closest('tr');
+            const inputs = fila.querySelectorAll('.grade-input');
+            let suma = 0;
+            let contador = 0;
+
+            inputs.forEach(i => {
+                const val = parseFloat(i.value);
+                if (!isNaN(val)) {
+                    suma += val;
+                    contador++;
+                }
+            });
+
+            const badgePromedio = fila.querySelector('.row-promedio');
+            if (contador > 0) {
+                const prom = (suma / contador).toFixed(1);
+                badgePromedio.textContent = prom;
+                if (prom >= 6.0) {
+                    badgePromedio.className = "row-promedio font-bold text-sm text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200";
+                } else {
+                    badgePromedio.className = "row-promedio font-bold text-sm text-red-700 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200";
+                }
+            } else {
+                badgePromedio.textContent = "-";
+                badgePromedio.className = "row-promedio font-bold text-sm text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200";
+            }
+        }
+
+        function openAddEvaluationModal() {
+            document.getElementById('eval-form')?.reset();
+            document.getElementById('eval-fecha').valueAsDate = new Date();
+            document.getElementById('evaluation-modal').classList.remove('hidden');
+        }
+
+        function handleEvaluationSubmit(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('eval-nombre').value.trim();
+            if (nombre && !state.currentEvaluations.includes(nombre)) {
+                state.currentEvaluations.push(nombre);
+            }
+            closeModal('evaluation-modal');
+            cargarMatrizNotas();
+            showToast('Actividad agregada a la planilla');
+        }
+
+        async function guardarNotas() {
+            const btn = document.getElementById('btn-save-grades');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Guardando...</span>`;
+
+            try {
+                const modulo = document.getElementById('grades-module-select').value;
+                const inputs = document.querySelectorAll('.grade-input');
+                const registros = [];
+
+                inputs.forEach(inp => {
+                    const val = inp.value !== '' ? parseFloat(inp.value) : null;
+                    if (val !== null) {
+                        registros.push({
+                            alumno_id: parseInt(inp.getAttribute('data-alumno-id'), 10),
+                            modulo: modulo,
+                            evaluacion: inp.getAttribute('data-evaluacion'),
+                            nota: val,
+                            fecha: new Date().toISOString().split('T')[0]
+                        });
+                    }
+                });
+
+                if (registros.length === 0) {
+                    showToast('No hay calificaciones escritas para guardar', 'error');
+                    return;
+                }
+
+                const { error } = await supabaseClient.from('calificaciones').upsert(registros, { onConflict: 'alumno_id,modulo,evaluacion' });
+
+                if (error) {
+                    throw error;
+                }
+
+                showToast('¡Calificaciones e historial guardados con éxito!');
+            } catch (err) {
+                console.error(err);
+                showToast('Error al guardar notas: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // FIN LÓGICA DE NOTAS
+        // -------------------------------------------------------------
 
         // 1. CARGA INTELIGENTE DE DATOS UNIFICADA
         async function cargarSeguimientoNivel() {
