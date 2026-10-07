@@ -308,7 +308,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tarea Asignada</label>
-                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></input>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +317,7 @@
                 </div>
             </div>
 
-            <!-- TAB NUEVA: NOTAS DE ALUMNOS -->
+            <!-- TAB: NOTAS DE ALUMNOS (CON GESTIÓN DE MÓDULOS Y TAREAS) -->
             <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-6">
                 <!-- Barra superior de filtros y acciones -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
@@ -333,11 +333,19 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Módulo / Asignatura:</label>
-                            <select id="grades-module-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                                <option value="Lectoescritura">Lectoescritura</option>
-                                <option value="Matemáticas Básicas">Matemáticas Básicas</option>
-                                <option value="Ciencias y Entorno">Ciencias y Entorno</option>
-                            </select>
+                            <div class="flex items-center space-x-1">
+                                <select id="grades-module-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </select>
+                                <button onclick="editarModuloActual()" title="Editar nombre de este módulo" class="p-2 text-slate-500 hover:text-brand-600 hover:bg-slate-100 rounded-lg text-xs transition-colors">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="eliminarModuloActual()" title="Eliminar este módulo" class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg text-xs transition-colors">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <button onclick="crearNuevoModulo()" title="Crear nuevo módulo" class="p-2 text-brand-600 hover:bg-brand-50 rounded-lg text-xs transition-colors font-semibold">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -359,7 +367,7 @@
                         <h3 class="text-sm font-bold text-slate-900 flex items-center">
                             <i class="fa-solid fa-table-cells text-brand-600 mr-2"></i> Planilla de Calificaciones del Nivel
                         </h3>
-                        <span class="text-xs text-slate-400">Escala de 0 a 10 (Promedio automático)</span>
+                        <span class="text-xs text-slate-400">Escala de 0 a 10 (Pasa el cursor por las tareas para editar o borrar)</span>
                     </div>
 
                     <div class="overflow-x-auto flex-1">
@@ -713,11 +721,19 @@
 
         const supabaseClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
-        let state = { students: [], teachers: [], countAsistencias: 0, currentEvaluations: ["Tarea 1", "Tarea 2", "Examen Parcial"] };
+        let state = { 
+            students: [], 
+            teachers: [], 
+            countAsistencias: 0, 
+            modulesList: ["Lectoescritura", "Matemáticas Básicas", "Ciencias y Entorno"],
+            currentEvaluations: ["Tarea 1", "Tarea 2", "Examen Parcial"] 
+        };
 
         window.onload = async function() {
             document.getElementById('tracker-date-select').valueAsDate = new Date();
             validarFechaLunesMartes();
+
+            poblarSelectModulos();
 
             const { data: { session } } = await supabaseClient.auth.getSession();
             gestionarEstadoSesion(session);
@@ -884,8 +900,131 @@
         }
 
         // -------------------------------------------------------------
-        // LÓGICA DEL MÓDULO DE NOTAS / CALIFICACIONES
+        // LÓGICA MÓDULO DE NOTAS: GESTIÓN DE MÓDULOS Y EVALUACIONES
         // -------------------------------------------------------------
+        
+        function poblarSelectModulos() {
+            const select = document.getElementById('grades-module-select');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = state.modulesList.map(m => `<option value="${m}">${m}</option>`).join('');
+            if (currentVal && state.modulesList.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function crearNuevoModulo() {
+            const nuevoModulo = prompt("Ingresa el nombre del nuevo Módulo / Asignatura:");
+            if (nuevoModulo && nuevoModulo.trim() !== "") {
+                const nombreLimpio = nuevoModulo.trim();
+                if (!state.modulesList.includes(nombreLimpio)) {
+                    state.modulesList.push(nombreLimpio);
+                    poblarSelectModulos();
+                    document.getElementById('grades-module-select').value = nombreLimpio;
+                    cargarMatrizNotas();
+                    showToast(`Módulo "${nombreLimpio}" creado`);
+                } else {
+                    showToast("Ese módulo ya existe", "error");
+                }
+            }
+        }
+
+        async function editarModuloActual() {
+            const select = document.getElementById('grades-module-select');
+            const moduloActual = select.value;
+            if (!moduloActual) return;
+
+            const nuevoNombre = prompt("Nuevo nombre para el módulo:", moduloActual);
+            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== moduloActual) {
+                const nombreLimpio = nuevoNombre.trim();
+
+                // Actualizar en Supabase las calificaciones con el nuevo nombre de módulo
+                const { error } = await supabaseClient
+                    .from('calificaciones')
+                    .update({ modulo: nombreLimpio })
+                    .eq('modulo', moduloActual);
+
+                if (error) {
+                    showToast('Error al actualizar módulo en Supabase: ' + error.message, 'error');
+                } else {
+                    const idx = state.modulesList.indexOf(moduloActual);
+                    if (idx !== -1) state.modulesList[idx] = nombreLimpio;
+                    poblarSelectModulos();
+                    select.value = nombreLimpio;
+                    cargarMatrizNotas();
+                    showToast('Nombre de módulo actualizado');
+                }
+            }
+        }
+
+        async function eliminarModuloActual() {
+            const select = document.getElementById('grades-module-select');
+            const moduloActual = select.value;
+            if (!moduloActual) return;
+
+            if (confirm(`¿Seguro que deseas eliminar el módulo "${moduloActual}"? Se borrarán sus calificaciones en Supabase.`)) {
+                const { error } = await supabaseClient
+                    .from('calificaciones')
+                    .delete()
+                    .eq('modulo', moduloActual);
+
+                if (!error) {
+                    state.modulesList = state.modulesList.filter(m => m !== moduloActual);
+                    if (state.modulesList.length === 0) {
+                        state.modulesList = ["General"];
+                    }
+                    poblarSelectModulos();
+                    cargarMatrizNotas();
+                    showToast(`Módulo "${moduloActual}" eliminado`);
+                } else {
+                    showToast('Error al eliminar módulo: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function editarEvaluacion(nombreEval) {
+            const nuevoNombre = prompt("Nuevo nombre para la tarea / evaluación:", nombreEval);
+            if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== nombreEval) {
+                const nombreLimpio = nuevoNombre.trim();
+                const modulo = document.getElementById('grades-module-select').value;
+
+                const { error } = await supabaseClient
+                    .from('calificaciones')
+                    .update({ evaluacion: nombreLimpio })
+                    .eq('modulo', modulo)
+                    .eq('evaluacion', nombreEval);
+
+                if (error) {
+                    showToast('Error al renombrar evaluación: ' + error.message, 'error');
+                } else {
+                    const idx = state.currentEvaluations.indexOf(nombreEval);
+                    if (idx !== -1) state.currentEvaluations[idx] = nombreLimpio;
+                    cargarMatrizNotas();
+                    showToast('Evaluación renombrada');
+                }
+            }
+        }
+
+        async function eliminarEvaluacion(nombreEval) {
+            if (confirm(`¿Seguro que deseas eliminar "${nombreEval}" y sus notas asociadas?`)) {
+                const modulo = document.getElementById('grades-module-select').value;
+
+                const { error } = await supabaseClient
+                    .from('calificaciones')
+                    .delete()
+                    .eq('modulo', modulo)
+                    .eq('evaluacion', nombreEval);
+
+                if (!error) {
+                    state.currentEvaluations = state.currentEvaluations.filter(e => e !== nombreEval);
+                    cargarMatrizNotas();
+                    showToast(`Tarea "${nombreEval}" eliminada`);
+                } else {
+                    showToast('Error al eliminar tarea: ' + error.message, 'error');
+                }
+            }
+        }
+
         async function cargarMatrizNotas() {
             const nivel = document.getElementById('grades-level-select').value;
             const modulo = document.getElementById('grades-module-select').value;
@@ -914,11 +1053,26 @@
                 });
             }
 
-            // Render Cabecera de la tabla
+            // Render Cabecera de la tabla con controles de Edición/Eliminación
             const headerRow = document.getElementById('grades-table-header');
             headerRow.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
+            
             evalList.forEach(ev => {
-                headerRow.innerHTML += `<th class="py-3 px-3 text-center font-semibold text-slate-600">${ev}</th>`;
+                headerRow.innerHTML += `
+                    <th class="py-3 px-3 text-center font-semibold text-slate-600 group relative">
+                        <div class="flex items-center justify-center space-x-1">
+                            <span>${ev}</span>
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-1">
+                                <button onclick="editarEvaluacion('${ev}')" title="Editar Tarea" class="text-blue-600 hover:text-blue-800 text-[10px]">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="eliminarEvaluacion('${ev}')" title="Eliminar Tarea" class="text-red-600 hover:text-red-800 text-[10px]">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </th>
+                `;
             });
             headerRow.innerHTML += `<th class="py-3 px-4 text-center font-bold text-brand-700">Promedio</th>`;
 
@@ -927,7 +1081,7 @@
             tbody.innerHTML = '';
 
             if (alumnosNivel.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${evalList.length + 2}" class="py-8 text-center text-slate-400 text-sm">No hay alumnos en ${nivel}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${evalList.length + 2}" class="py-8 text-center text-slate-400 text-sm">No hay alumnos registrados en ${nivel}</td></tr>`;
                 return;
             }
 
@@ -999,7 +1153,7 @@
         }
 
         function openAddEvaluationModal() {
-            document.getElementById('eval-form')?.reset();
+            document.getElementById('evaluation-form')?.reset();
             document.getElementById('eval-fecha').valueAsDate = new Date();
             document.getElementById('evaluation-modal').classList.remove('hidden');
         }
@@ -1064,7 +1218,6 @@
         // FIN LÓGICA DE NOTAS
         // -------------------------------------------------------------
 
-        // 1. CARGA INTELIGENTE DE DATOS UNIFICADA
         async function cargarSeguimientoNivel() {
             const nivelSeleccionado = document.getElementById('tracker-level-select').value;
             const fecha = document.getElementById('tracker-date-select').value;
@@ -1155,7 +1308,6 @@
             }
         }
 
-        // 2. BOTÓN ÚNICO DE GUARDADO ("Guardar Formulario Completo")
         async function guardarFormularioCompleto() {
             const btn = document.getElementById('btn-save-full-form');
             const originalContent = btn.innerHTML;
