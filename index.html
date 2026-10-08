@@ -428,8 +428,8 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos en Nivel</p>
-                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-total-students">0</h3>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos / Maestros</p>
+                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-total-students">0 / 0</h3>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-users"></i>
@@ -448,7 +448,7 @@
 
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">% Asistencia Promedio</p>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">% Asistencia Alumnos</p>
                                 <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-avg-attendance">0%</h3>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
@@ -467,11 +467,11 @@
                         </div>
                     </div>
 
-                    <!-- REPORTE 1: ASISTENCIAS POR NIVEL -->
+                    <!-- REPORTE 1: ASISTENCIAS DE ALUMNOS POR NIVEL -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                         <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
-                                <i class="fa-solid fa-calendar-check text-brand-600 mr-2"></i> Reporte Consolidado de Asistencia por Alumno
+                                <i class="fa-solid fa-calendar-check text-brand-600 mr-2"></i> Reporte Consolidado de Asistencia - Alumnos
                             </h3>
                             <span class="text-xs text-slate-400" id="report-attendance-subtitle">Evaluación de asistencias</span>
                         </div>
@@ -493,11 +493,37 @@
                         </div>
                     </div>
 
-                    <!-- REPORTE 2: NOTAS / CALIFICACIONES POR NIVEL -->
+                    <!-- REPORTE 2: ASISTENCIAS DE MAESTROS POR NIVEL -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                         <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
-                                <i class="fa-solid fa-square-poll-vertical text-indigo-600 mr-2"></i> Reporte Consolidado de Calificaciones
+                                <i class="fa-solid fa-user-tie text-indigo-600 mr-2"></i> Reporte Consolidado de Asistencia - Maestros
+                            </h3>
+                            <span class="text-xs text-slate-400" id="report-teachers-subtitle">Asistencia de docentes</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Maestro</th>
+                                        <th class="py-3 px-4">Rol en el Nivel</th>
+                                        <th class="py-3 px-4 text-center">Clases Asistidas</th>
+                                        <th class="py-3 px-4 text-center">% Asistencia</th>
+                                        <th class="py-3 px-4 text-right">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-teachers-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- REPORTE 3: NOTAS / CALIFICACIONES POR NIVEL -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                                <i class="fa-solid fa-square-poll-vertical text-purple-600 mr-2"></i> Reporte Consolidado de Calificaciones
                             </h3>
                             <span class="text-xs text-slate-400" id="report-grades-subtitle">Escala 0.0 - 10.0</span>
                         </div>
@@ -1356,162 +1382,222 @@
             const modulo = document.getElementById('report-module-select').value || state.modulesList[0];
 
             document.getElementById('report-attendance-subtitle').textContent = `Filtro: ${nivel}`;
+            document.getElementById('report-teachers-subtitle').textContent = `Filtro: ${nivel}`;
             document.getElementById('report-grades-subtitle').textContent = `Filtro: ${nivel} | Módulo: ${modulo}`;
 
             const alumnosNivel = state.students.filter(s => s.nivel === nivel);
-            document.getElementById('report-stat-total-students').textContent = alumnosNivel.length;
+            const maestrosNivel = state.teachers.filter(m => m.nivel === nivel);
 
+            document.getElementById('report-stat-total-students').textContent = `${alumnosNivel.length} / ${maestrosNivel.length}`;
+
+            // A) REPORTE ASISTENCIA ALUMNOS
             if (alumnosNivel.length === 0) {
-                document.getElementById('report-stat-total-classes').textContent = '0';
-                document.getElementById('report-stat-avg-attendance').textContent = '0%';
-                document.getElementById('report-stat-avg-grade').textContent = '0.0';
                 document.getElementById('report-attendance-tbody').innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivel}</td></tr>`;
+            } else {
+                const idsAlumnos = alumnosNivel.map(s => String(s.id));
+                const { data: asistencias } = await supabaseClient
+                    .from('asistencia')
+                    .select('*')
+                    .in('alumno_id', idsAlumnos);
+
+                const fechasUnicas = new Set();
+                const mapaAsistencias = {};
+
+                if (asistencias) {
+                    asistencias.forEach(a => {
+                        fechasUnicas.add(a.fecha);
+                        if (!mapaAsistencias[a.alumno_id]) {
+                            mapaAsistencias[a.alumno_id] = { total: 0, asistio: 0 };
+                        }
+                        mapaAsistencias[a.alumno_id].total++;
+                        if (a.presente) mapaAsistencias[a.alumno_id].asistio++;
+                    });
+                }
+
+                const totalClases = fechasUnicas.size;
+                document.getElementById('report-stat-total-classes').textContent = totalClases;
+
+                const tbodyAtt = document.getElementById('report-attendance-tbody');
+                tbodyAtt.innerHTML = '';
+                let sumaPorcentajesAtt = 0;
+
+                alumnosNivel.forEach(s => {
+                    const infoAtt = mapaAsistencias[s.id] || { total: totalClases, asistio: 0 };
+                    const cAsistidas = infoAtt.asistio;
+                    const pct = totalClases > 0 ? Math.round((cAsistidas / totalClases) * 100) : 0;
+                    sumaPorcentajesAtt += pct;
+
+                    let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                    let estadoTxt = 'Excelente';
+
+                    if (pct < 60) {
+                        badgeColor = 'bg-red-50 text-red-700 border-red-200';
+                        estadoTxt = 'Crítico';
+                    } else if (pct < 80) {
+                        badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                        estadoTxt = 'Regular';
+                    }
+
+                    tbodyAtt.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
+                            <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'No asignado'}</td>
+                            <td class="py-3 px-4 text-center font-bold text-slate-700">${cAsistidas} / ${totalClases}</td>
+                            <td class="py-3 px-4 text-center font-extrabold text-sm">${pct}%</td>
+                            <td class="py-3 px-4 text-right">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeColor}">${estadoTxt}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                const avgAttGlobal = alumnosNivel.length > 0 ? Math.round(sumaPorcentajesAtt / alumnosNivel.length) : 0;
+                document.getElementById('report-stat-avg-attendance').textContent = `${avgAttGlobal}%`;
+            }
+
+            // B) REPORTE ASISTENCIA MAESTROS
+            const tbodyTeachers = document.getElementById('report-teachers-tbody');
+            tbodyTeachers.innerHTML = '';
+
+            if (maestrosNivel.length === 0) {
+                tbodyTeachers.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">No hay maestros asignados a ${nivel}</td></tr>`;
+            } else {
+                const idsMaestros = maestrosNivel.map(m => String(m.id));
+                const { data: asistenciasMaestros } = await supabaseClient
+                    .from('asistencia_maestros')
+                    .select('*')
+                    .in('maestro_id', idsMaestros);
+
+                const fechasUnicasM = new Set();
+                const mapaAsistenciasM = {};
+
+                if (asistenciasMaestros) {
+                    asistenciasMaestros.forEach(a => {
+                        fechasUnicasM.add(a.fecha);
+                        if (!mapaAsistenciasM[a.maestro_id]) {
+                            mapaAsistenciasM[a.maestro_id] = { total: 0, asistio: 0 };
+                        }
+                        mapaAsistenciasM[a.maestro_id].total++;
+                        if (a.presente) mapaAsistenciasM[a.maestro_id].asistio++;
+                    });
+                }
+
+                const totalClasesM = fechasUnicasM.size;
+
+                maestrosNivel.forEach(m => {
+                    const infoAtt = mapaAsistenciasM[m.id] || { total: totalClasesM, asistio: 0 };
+                    const cAsistidas = infoAtt.asistio;
+                    const pct = totalClasesM > 0 ? Math.round((cAsistidas / totalClasesM) * 100) : 0;
+
+                    let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                    let estadoTxt = 'Excelente';
+
+                    if (pct < 60) {
+                        badgeColor = 'bg-red-50 text-red-700 border-red-200';
+                        estadoTxt = 'Irregular';
+                    } else if (pct < 80) {
+                        badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                        estadoTxt = 'Aceptable';
+                    }
+
+                    tbodyTeachers.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-semibold text-slate-800">${m.nombre}</td>
+                            <td class="py-3 px-4 text-xs text-slate-500">${m.rol_nivel || 'Docente'}</td>
+                            <td class="py-3 px-4 text-center font-bold text-slate-700">${cAsistidas} / ${totalClasesM}</td>
+                            <td class="py-3 px-4 text-center font-extrabold text-sm">${pct}%</td>
+                            <td class="py-3 px-4 text-right">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeColor}">${estadoTxt}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // C) REPORTE NOTAS
+            if (alumnosNivel.length === 0) {
+                document.getElementById('report-stat-avg-grade').textContent = '0.0';
                 document.getElementById('report-grades-tbody').innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivel}</td></tr>`;
-                return;
-            }
+            } else {
+                const { data: calificaciones } = await supabaseClient
+                    .from('calificaciones')
+                    .select('*')
+                    .eq('modulo', modulo);
 
-            const idsAlumnos = alumnosNivel.map(s => String(s.id));
+                const evalsModulo = new Set();
+                const mapaNotas = {};
 
-            // A) REPORTE ASISTENCIA
-            const { data: asistencias } = await supabaseClient
-                .from('asistencia')
-                .select('*')
-                .in('alumno_id', idsAlumnos);
-
-            const fechasUnicas = new Set();
-            const mapaAsistencias = {};
-
-            if (asistencias) {
-                asistencias.forEach(a => {
-                    fechasUnicas.add(a.fecha);
-                    if (!mapaAsistencias[a.alumno_id]) {
-                        mapaAsistencias[a.alumno_id] = { total: 0, asistio: 0 };
-                    }
-                    mapaAsistencias[a.alumno_id].total++;
-                    if (a.presente) mapaAsistencias[a.alumno_id].asistio++;
-                });
-            }
-
-            const totalClases = fechasUnicas.size;
-            document.getElementById('report-stat-total-classes').textContent = totalClases;
-
-            const tbodyAtt = document.getElementById('report-attendance-tbody');
-            tbodyAtt.innerHTML = '';
-
-            let sumaPorcentajesAtt = 0;
-
-            alumnosNivel.forEach(s => {
-                const infoAtt = mapaAsistencias[s.id] || { total: totalClases, asistio: 0 };
-                const cAsistidas = infoAtt.asistio;
-                const pct = totalClases > 0 ? Math.round((cAsistidas / totalClases) * 100) : 0;
-                sumaPorcentajesAtt += pct;
-
-                let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-                let estadoTxt = 'Excelente';
-
-                if (pct < 60) {
-                    badgeColor = 'bg-red-50 text-red-700 border-red-200';
-                    estadoTxt = 'Crítico';
-                } else if (pct < 80) {
-                    badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
-                    estadoTxt = 'Regular';
+                if (calificaciones) {
+                    calificaciones.forEach(c => {
+                        evalsModulo.add(c.evaluacion);
+                        if (!mapaNotas[c.alumno_id]) mapaNotas[c.alumno_id] = {};
+                        mapaNotas[c.alumno_id][c.evaluacion] = c.nota;
+                    });
                 }
 
-                tbodyAtt.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
-                        <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'No asignado'}</td>
-                        <td class="py-3 px-4 text-center font-bold text-slate-700">${cAsistidas} / ${totalClases}</td>
-                        <td class="py-3 px-4 text-center font-extrabold text-sm">${pct}%</td>
-                        <td class="py-3 px-4 text-right">
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeColor}">${estadoTxt}</span>
-                        </td>
-                    </tr>
-                `;
-            });
+                const evalList = Array.from(evalsModulo);
 
-            const avgAttGlobal = alumnosNivel.length > 0 ? Math.round(sumaPorcentajesAtt / alumnosNivel.length) : 0;
-            document.getElementById('report-stat-avg-attendance').textContent = `${avgAttGlobal}%`;
-
-            // B) REPORTE NOTAS
-            const { data: calificaciones } = await supabaseClient
-                .from('calificaciones')
-                .select('*')
-                .eq('modulo', modulo);
-
-            const evalsModulo = new Set();
-            const mapaNotas = {};
-
-            if (calificaciones) {
-                calificaciones.forEach(c => {
-                    evalsModulo.add(c.evaluacion);
-                    if (!mapaNotas[c.alumno_id]) mapaNotas[c.alumno_id] = {};
-                    mapaNotas[c.alumno_id][c.evaluacion] = c.nota;
-                });
-            }
-
-            const evalList = Array.from(evalsModulo);
-
-            const headerGrades = document.getElementById('report-grades-header');
-            headerGrades.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
-            evalList.forEach(ev => {
-                headerGrades.innerHTML += `<th class="py-3 px-3 text-center font-semibold text-slate-600">${ev}</th>`;
-            });
-            headerGrades.innerHTML += `
-                <th class="py-3 px-4 text-center font-bold text-indigo-700">Promedio</th>
-                <th class="py-3 px-4 text-right font-bold text-slate-600">Estatus</th>
-            `;
-
-            const tbodyGrades = document.getElementById('report-grades-tbody');
-            tbodyGrades.innerHTML = '';
-
-            let sumaPromediosGeneral = 0;
-            let totalAlumnosConNotas = 0;
-
-            alumnosNivel.forEach(s => {
-                let colNotasHtml = '';
-                let sumaAlumno = 0;
-                let contAlumno = 0;
-
+                const headerGrades = document.getElementById('report-grades-header');
+                headerGrades.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
                 evalList.forEach(ev => {
-                    const val = (mapaNotas[s.id] && mapaNotas[s.id][ev] !== undefined) ? mapaNotas[s.id][ev] : null;
-                    if (val !== null) {
-                        sumaAlumno += parseFloat(val);
-                        contAlumno++;
-                        colNotasHtml += `<td class="py-3 px-3 text-center font-medium text-slate-700">${parseFloat(val).toFixed(1)}</td>`;
-                    } else {
-                        colNotasHtml += `<td class="py-3 px-3 text-center text-slate-300">-</td>`;
+                    headerGrades.innerHTML += `<th class="py-3 px-3 text-center font-semibold text-slate-600">${ev}</th>`;
+                });
+                headerGrades.innerHTML += `
+                    <th class="py-3 px-4 text-center font-bold text-indigo-700">Promedio</th>
+                    <th class="py-3 px-4 text-right font-bold text-slate-600">Estatus</th>
+                `;
+
+                const tbodyGrades = document.getElementById('report-grades-tbody');
+                tbodyGrades.innerHTML = '';
+
+                let sumaPromediosGeneral = 0;
+                let totalAlumnosConNotas = 0;
+
+                alumnosNivel.forEach(s => {
+                    let colNotasHtml = '';
+                    let sumaAlumno = 0;
+                    let contAlumno = 0;
+
+                    evalList.forEach(ev => {
+                        const val = (mapaNotas[s.id] && mapaNotas[s.id][ev] !== undefined) ? mapaNotas[s.id][ev] : null;
+                        if (val !== null) {
+                            sumaAlumno += parseFloat(val);
+                            contAlumno++;
+                            colNotasHtml += `<td class="py-3 px-3 text-center font-medium text-slate-700">${parseFloat(val).toFixed(1)}</td>`;
+                        } else {
+                            colNotasHtml += `<td class="py-3 px-3 text-center text-slate-300">-</td>`;
+                        }
+                    });
+
+                    let promedioTxt = '-';
+                    let statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-semibold">Sin Evaluaciones</span>`;
+
+                    if (contAlumno > 0) {
+                        const prom = (sumaAlumno / contAlumno);
+                        promedioTxt = prom.toFixed(1);
+                        sumaPromediosGeneral += prom;
+                        totalAlumnosConNotas++;
+
+                        if (prom >= 6.0) {
+                            statusBadge = `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold">Aprobado</span>`;
+                        } else {
+                            statusBadge = `<span class="px-2.5 py-1 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-bold">Reprobado</span>`;
+                        }
                     }
+
+                    tbodyGrades.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
+                            ${colNotasHtml}
+                            <td class="py-3 px-4 text-center font-extrabold text-sm text-indigo-700">${promedioTxt}</td>
+                            <td class="py-3 px-4 text-right">${statusBadge}</td>
+                        </tr>
+                    `;
                 });
 
-                let promedioTxt = '-';
-                let statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-semibold">Sin Evaluaciones</span>`;
-
-                if (contAlumno > 0) {
-                    const prom = (sumaAlumno / contAlumno);
-                    promedioTxt = prom.toFixed(1);
-                    sumaPromediosGeneral += prom;
-                    totalAlumnosConNotas++;
-
-                    if (prom >= 6.0) {
-                        statusBadge = `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold">Aprobado</span>`;
-                    } else {
-                        statusBadge = `<span class="px-2.5 py-1 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-bold">Reprobado</span>`;
-                    }
-                }
-
-                tbodyGrades.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
-                        ${colNotasHtml}
-                        <td class="py-3 px-4 text-center font-extrabold text-sm text-indigo-700">${promedioTxt}</td>
-                        <td class="py-3 px-4 text-right">${statusBadge}</td>
-                    </tr>
-                `;
-            });
-
-            const promGlobal = totalAlumnosConNotas > 0 ? (sumaPromediosGeneral / totalAlumnosConNotas).toFixed(1) : '0.0';
-            document.getElementById('report-stat-avg-grade').textContent = promGlobal;
+                const promGlobal = totalAlumnosConNotas > 0 ? (sumaPromediosGeneral / totalAlumnosConNotas).toFixed(1) : '0.0';
+                document.getElementById('report-stat-avg-grade').textContent = promGlobal;
+            }
         }
 
         async function cargarSeguimientoNivel() {
