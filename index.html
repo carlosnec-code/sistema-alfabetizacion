@@ -36,6 +36,20 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        @media print {
+            header, .tab-btn-container, .no-print {
+                display: none !important;
+            }
+            body {
+                background-color: #ffffff !important;
+            }
+            .print-area {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-full flex flex-col">
@@ -112,7 +126,7 @@
         <!-- Main Container -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
             <!-- Navigation Bar -->
-            <div class="flex space-x-1 sm:space-x-2 bg-slate-200/70 p-1.5 rounded-2xl mb-6 overflow-x-auto">
+            <div class="tab-btn-container flex space-x-1 sm:space-x-2 bg-slate-200/70 p-1.5 rounded-2xl mb-6 overflow-x-auto">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 bg-white text-brand-700 shadow-sm">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Resumen</span>
@@ -124,6 +138,10 @@
                 <button onclick="switchTab('grades')" id="nav-grades" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <span>Notas / Tareas</span>
+                </button>
+                <button onclick="switchTab('reports')" id="nav-reports" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-file-contract"></i>
+                    <span>Informes</span>
                 </button>
                 <button onclick="switchTab('students')" id="nav-students" class="tab-btn flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-center space-x-2 text-slate-600 hover:text-slate-900">
                     <i class="fa-solid fa-users"></i>
@@ -221,7 +239,6 @@
 
             <!-- TAB: SEGUIMIENTO POR NIVEL (FLUJO UNIFICADO) -->
             <div id="tab-level-tracker" class="tab-content hidden flex-1 flex flex-col space-y-6">
-                <!-- Filtros Principales y Botón Único -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-4">
                     <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                         <div class="w-full sm:w-auto">
@@ -244,17 +261,13 @@
                         </div>
                     </div>
 
-                    <!-- Botón Unificado de Guardado -->
                     <button id="btn-save-full-form" onclick="guardarFormularioCompleto()" class="w-full lg:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all shadow-md flex items-center justify-center space-x-2 shrink-0">
                         <i class="fa-solid fa-floppy-disk"></i>
                         <span>Guardar Formulario Completo</span>
                     </button>
                 </div>
 
-                <!-- Contenido Principal: Asistencias y Avance (Planilla Unificada) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Columna Izquierda: Asistencia de Alumnos -->
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col">
                         <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-bold text-slate-900 flex items-center">
@@ -278,9 +291,7 @@
                         </div>
                     </div>
 
-                    <!-- Columna Derecha: Asistencia de Maestros & Bitácora -->
                     <div class="space-y-6">
-                        <!-- Asistencia Maestros -->
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
                                 <h3 class="text-sm font-bold text-slate-900 flex items-center">
@@ -292,7 +303,6 @@
                             </div>
                         </div>
 
-                        <!-- Bitácora de Clase -->
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                             <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center border-b border-slate-100 pb-2">
                                 <i class="fa-solid fa-book-bookmark text-amber-600 mr-2"></i> Registro de Clase / Avance
@@ -308,18 +318,16 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tarea Asignada</label>
-                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"></input>
+                                    <input type="text" id="bitacora-tarea" placeholder="Ej. Recortar palabras de periódico..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- TAB: NOTAS DE ALUMNOS (CON GESTIÓN DE MÓDULOS Y TAREAS) -->
+            <!-- TAB: NOTAS DE ALUMNOS -->
             <div id="tab-grades" class="tab-content hidden flex-1 flex flex-col space-y-6">
-                <!-- Barra superior de filtros y acciones -->
                 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                         <div>
@@ -361,7 +369,6 @@
                     </div>
                 </div>
 
-                <!-- Tabla Planilla de Calificaciones (Matriz) -->
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
                     <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center">
@@ -375,7 +382,6 @@
                             <thead>
                                 <tr id="grades-table-header" class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     <th class="py-3 px-4">Alumno</th>
-                                    <!-- Columnas de evaluaciones generadas dinámicamente -->
                                     <th class="py-3 px-4 text-center">Promedio</th>
                                 </tr>
                             </thead>
@@ -383,6 +389,134 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- TAB: MÓDULO DE INFORMES -->
+            <div id="tab-reports" class="tab-content hidden flex-1 flex flex-col space-y-6">
+                <!-- Filtros del Informe -->
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel Académico:</label>
+                            <select id="report-level-select" onchange="generarInformes()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
+                                <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
+                                <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
+                                <option value="Avanzado (Nivel 3)">Avanzado (Nivel 3)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Módulo para Notas:</label>
+                            <select id="report-module-select" onchange="generarInformes()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Imprimir / Exportar PDF</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Area Imprimible de Informes -->
+                <div class="print-area space-y-6">
+                    
+                    <!-- Tarjetas Resumen (KPIs) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alumnos en Nivel</p>
+                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-total-students">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Clases Impartidas</p>
+                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-total-classes">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-chalkboard"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">% Asistencia Promedio</p>
+                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-avg-attendance">0%</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Nota Promedio Nivel</p>
+                                <h3 class="text-2xl font-bold text-slate-900 mt-1" id="report-stat-avg-grade">0.0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REPORTE 1: ASISTENCIAS POR NIVEL -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                                <i class="fa-solid fa-calendar-check text-brand-600 mr-2"></i> Reporte Consolidado de Asistencia por Alumno
+                            </h3>
+                            <span class="text-xs text-slate-400" id="report-attendance-subtitle">Evaluación de asistencias</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Alumno</th>
+                                        <th class="py-3 px-4">Maestro Responsable</th>
+                                        <th class="py-3 px-4 text-center">Clases Asistidas</th>
+                                        <th class="py-3 px-4 text-center">% Asistencia</th>
+                                        <th class="py-3 px-4 text-right">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-attendance-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- REPORTE 2: NOTAS / CALIFICACIONES POR NIVEL -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                                <i class="fa-solid fa-square-poll-vertical text-indigo-600 mr-2"></i> Reporte Consolidado de Calificaciones
+                            </h3>
+                            <span class="text-xs text-slate-400" id="report-grades-subtitle">Escala 0.0 - 10.0</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr id="report-grades-header" class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3 px-4">Alumno</th>
+                                        <th class="py-3 px-4 text-center">Promedio</th>
+                                        <th class="py-3 px-4 text-right">Estatus</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-grades-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -855,6 +989,7 @@
             if (tabId === 'dashboard') renderDashboard();
             if (tabId === 'level-tracker') cargarSeguimientoNivel();
             if (tabId === 'grades') cargarMatrizNotas();
+            if (tabId === 'reports') generarInformes();
             if (tabId === 'students') renderStudentsTable();
             if (tabId === 'teachers') renderTeachersTable();
             if (tabId === 'documents') renderDocumentsGrid();
@@ -904,13 +1039,19 @@
         // -------------------------------------------------------------
         
         function poblarSelectModulos() {
-            const select = document.getElementById('grades-module-select');
-            if (!select) return;
-            const currentVal = select.value;
-            select.innerHTML = state.modulesList.map(m => `<option value="${m}">${m}</option>`).join('');
-            if (currentVal && state.modulesList.includes(currentVal)) {
-                select.value = currentVal;
-            }
+            const selects = [
+                document.getElementById('grades-module-select'),
+                document.getElementById('report-module-select')
+            ];
+            
+            selects.forEach(select => {
+                if (!select) return;
+                const currentVal = select.value;
+                select.innerHTML = state.modulesList.map(m => `<option value="${m}">${m}</option>`).join('');
+                if (currentVal && state.modulesList.includes(currentVal)) {
+                    select.value = currentVal;
+                }
+            });
         }
 
         function crearNuevoModulo() {
@@ -938,7 +1079,6 @@
             if (nuevoNombre && nuevoNombre.trim() !== "" && nuevoNombre !== moduloActual) {
                 const nombreLimpio = nuevoNombre.trim();
 
-                // Actualizar en Supabase las calificaciones con el nuevo nombre de módulo
                 const { error } = await supabaseClient
                     .from('calificaciones')
                     .update({ modulo: nombreLimpio })
@@ -1031,20 +1171,17 @@
 
             const alumnosNivel = state.students.filter(s => s.nivel === nivel);
 
-            // Obtener todas las calificaciones guardadas para este módulo
             const { data: notasDB } = await supabaseClient
                 .from('calificaciones')
                 .select('*')
                 .eq('modulo', modulo);
 
-            // Descubrir qué actividades existen registradas en Supabase para este módulo
             const evaluacionesUnicas = new Set(state.currentEvaluations);
             if (notasDB) {
                 notasDB.forEach(n => evaluacionesUnicas.add(n.evaluacion));
             }
             const evalList = Array.from(evaluacionesUnicas);
 
-            // Mapa para rápida consulta [alumno_id][evaluacion] = nota
             const mapNotas = {};
             if (notasDB) {
                 notasDB.forEach(n => {
@@ -1053,7 +1190,6 @@
                 });
             }
 
-            // Render Cabecera de la tabla con controles de Edición/Eliminación
             const headerRow = document.getElementById('grades-table-header');
             headerRow.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
             
@@ -1076,7 +1212,6 @@
             });
             headerRow.innerHTML += `<th class="py-3 px-4 text-center font-bold text-brand-700">Promedio</th>`;
 
-            // Render Filas de Alumnos
             const tbody = document.getElementById('grades-table-body');
             tbody.innerHTML = '';
 
@@ -1113,7 +1248,6 @@
                 `;
             });
 
-            // Re-calcular promedios iniciales
             alumnosNivel.forEach(s => {
                 const fila = document.getElementById(`student-row-${s.id}`);
                 if (fila) {
@@ -1215,8 +1349,170 @@
         }
 
         // -------------------------------------------------------------
-        // FIN LÓGICA DE NOTAS
+        // LÓGICA DEL MÓDULO DE INFORMES / REPORTES
         // -------------------------------------------------------------
+        async function generarInformes() {
+            const nivel = document.getElementById('report-level-select').value;
+            const modulo = document.getElementById('report-module-select').value || state.modulesList[0];
+
+            document.getElementById('report-attendance-subtitle').textContent = `Filtro: ${nivel}`;
+            document.getElementById('report-grades-subtitle').textContent = `Filtro: ${nivel} | Módulo: ${modulo}`;
+
+            const alumnosNivel = state.students.filter(s => s.nivel === nivel);
+            document.getElementById('report-stat-total-students').textContent = alumnosNivel.length;
+
+            if (alumnosNivel.length === 0) {
+                document.getElementById('report-stat-total-classes').textContent = '0';
+                document.getElementById('report-stat-avg-attendance').textContent = '0%';
+                document.getElementById('report-stat-avg-grade').textContent = '0.0';
+                document.getElementById('report-attendance-tbody').innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivel}</td></tr>`;
+                document.getElementById('report-grades-tbody').innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 text-xs">No hay alumnos registrados en ${nivel}</td></tr>`;
+                return;
+            }
+
+            const idsAlumnos = alumnosNivel.map(s => String(s.id));
+
+            // A) REPORTE ASISTENCIA
+            const { data: asistencias } = await supabaseClient
+                .from('asistencia')
+                .select('*')
+                .in('alumno_id', idsAlumnos);
+
+            const fechasUnicas = new Set();
+            const mapaAsistencias = {};
+
+            if (asistencias) {
+                asistencias.forEach(a => {
+                    fechasUnicas.add(a.fecha);
+                    if (!mapaAsistencias[a.alumno_id]) {
+                        mapaAsistencias[a.alumno_id] = { total: 0, asistio: 0 };
+                    }
+                    mapaAsistencias[a.alumno_id].total++;
+                    if (a.presente) mapaAsistencias[a.alumno_id].asistio++;
+                });
+            }
+
+            const totalClases = fechasUnicas.size;
+            document.getElementById('report-stat-total-classes').textContent = totalClases;
+
+            const tbodyAtt = document.getElementById('report-attendance-tbody');
+            tbodyAtt.innerHTML = '';
+
+            let sumaPorcentajesAtt = 0;
+
+            alumnosNivel.forEach(s => {
+                const infoAtt = mapaAsistencias[s.id] || { total: totalClases, asistio: 0 };
+                const cAsistidas = infoAtt.asistio;
+                const pct = totalClases > 0 ? Math.round((cAsistidas / totalClases) * 100) : 0;
+                sumaPorcentajesAtt += pct;
+
+                let badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                let estadoTxt = 'Excelente';
+
+                if (pct < 60) {
+                    badgeColor = 'bg-red-50 text-red-700 border-red-200';
+                    estadoTxt = 'Crítico';
+                } else if (pct < 80) {
+                    badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                    estadoTxt = 'Regular';
+                }
+
+                tbodyAtt.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">${s.maestro_responsable || 'No asignado'}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-700">${cAsistidas} / ${totalClases}</td>
+                        <td class="py-3 px-4 text-center font-extrabold text-sm">${pct}%</td>
+                        <td class="py-3 px-4 text-right">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeColor}">${estadoTxt}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const avgAttGlobal = alumnosNivel.length > 0 ? Math.round(sumaPorcentajesAtt / alumnosNivel.length) : 0;
+            document.getElementById('report-stat-avg-attendance').textContent = `${avgAttGlobal}%`;
+
+            // B) REPORTE NOTAS
+            const { data: calificaciones } = await supabaseClient
+                .from('calificaciones')
+                .select('*')
+                .eq('modulo', modulo);
+
+            const evalsModulo = new Set();
+            const mapaNotas = {};
+
+            if (calificaciones) {
+                calificaciones.forEach(c => {
+                    evalsModulo.add(c.evaluacion);
+                    if (!mapaNotas[c.alumno_id]) mapaNotas[c.alumno_id] = {};
+                    mapaNotas[c.alumno_id][c.evaluacion] = c.nota;
+                });
+            }
+
+            const evalList = Array.from(evalsModulo);
+
+            const headerGrades = document.getElementById('report-grades-header');
+            headerGrades.innerHTML = `<th class="py-3 px-4 font-semibold text-slate-600">Alumno</th>`;
+            evalList.forEach(ev => {
+                headerGrades.innerHTML += `<th class="py-3 px-3 text-center font-semibold text-slate-600">${ev}</th>`;
+            });
+            headerGrades.innerHTML += `
+                <th class="py-3 px-4 text-center font-bold text-indigo-700">Promedio</th>
+                <th class="py-3 px-4 text-right font-bold text-slate-600">Estatus</th>
+            `;
+
+            const tbodyGrades = document.getElementById('report-grades-tbody');
+            tbodyGrades.innerHTML = '';
+
+            let sumaPromediosGeneral = 0;
+            let totalAlumnosConNotas = 0;
+
+            alumnosNivel.forEach(s => {
+                let colNotasHtml = '';
+                let sumaAlumno = 0;
+                let contAlumno = 0;
+
+                evalList.forEach(ev => {
+                    const val = (mapaNotas[s.id] && mapaNotas[s.id][ev] !== undefined) ? mapaNotas[s.id][ev] : null;
+                    if (val !== null) {
+                        sumaAlumno += parseFloat(val);
+                        contAlumno++;
+                        colNotasHtml += `<td class="py-3 px-3 text-center font-medium text-slate-700">${parseFloat(val).toFixed(1)}</td>`;
+                    } else {
+                        colNotasHtml += `<td class="py-3 px-3 text-center text-slate-300">-</td>`;
+                    }
+                });
+
+                let promedioTxt = '-';
+                let statusBadge = `<span class="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-semibold">Sin Evaluaciones</span>`;
+
+                if (contAlumno > 0) {
+                    const prom = (sumaAlumno / contAlumno);
+                    promedioTxt = prom.toFixed(1);
+                    sumaPromediosGeneral += prom;
+                    totalAlumnosConNotas++;
+
+                    if (prom >= 6.0) {
+                        statusBadge = `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold">Aprobado</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2.5 py-1 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-bold">Reprobado</span>`;
+                    }
+                }
+
+                tbodyGrades.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-semibold text-slate-800">${s.nombres} ${s.apellidos}</td>
+                        ${colNotasHtml}
+                        <td class="py-3 px-4 text-center font-extrabold text-sm text-indigo-700">${promedioTxt}</td>
+                        <td class="py-3 px-4 text-right">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+
+            const promGlobal = totalAlumnosConNotas > 0 ? (sumaPromediosGeneral / totalAlumnosConNotas).toFixed(1) : '0.0';
+            document.getElementById('report-stat-avg-grade').textContent = promGlobal;
+        }
 
         async function cargarSeguimientoNivel() {
             const nivelSeleccionado = document.getElementById('tracker-level-select').value;
