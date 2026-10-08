@@ -247,7 +247,7 @@
                     <div class="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
                         <div class="w-full sm:w-auto">
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Seleccionar Nivel:</label>
-                            <select id="tracker-level-select" onchange="cargarSeguimientoNivel()" class="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <select id="tracker-level-select" onchange="cargarSeguimientoNivel()" class="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-200 disabled:text-slate-500">
                                 <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
                                 <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                                 <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
@@ -336,7 +336,7 @@
                     <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel:</label>
-                            <select id="grades-level-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <select id="grades-level-select" onchange="cargarMatrizNotas()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-200 disabled:text-slate-500">
                                 <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
                                 <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                                 <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
@@ -403,7 +403,7 @@
                     <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Nivel Académico:</label>
-                            <select id="report-level-select" onchange="generarInformes()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <select id="report-level-select" onchange="generarInformes()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-200 disabled:text-slate-500">
                                 <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
                                 <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                                 <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
@@ -730,7 +730,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Nivel Alfabetización</label>
-                        <select id="student-level" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <select id="student-level" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-slate-200 disabled:text-slate-500">
                             <option value="Inicial (Nivel 0)">Inicial (Nivel 0)</option>
                             <option value="Principiante (Nivel 1)">Principiante (Nivel 1)</option>
                             <option value="Intermedio (Nivel 2)">Intermedio (Nivel 2)</option>
@@ -893,8 +893,8 @@
             currentEvaluations: ["Tarea 1", "Tarea 2", "Examen Parcial"],
             currentUser: {
                 email: "",
-                rol: "Administrador", // "Administrador", "Líder de nivel", "Sublíder", "Colaborador"
-                nivelAsignado: "Inicial (Nivel 0)"
+                rol: "Administrador", 
+                nivelAsignado: null
             }
         };
 
@@ -925,7 +925,6 @@
                     userBadge.classList.remove('hidden');
                 }
 
-                // Cargar datos del usuario y aplicar permisos por rol
                 await identificarRolUsuario(session.user.email);
                 await cargarDatos();
             } else {
@@ -937,12 +936,10 @@
         async function identificarRolUsuario(email) {
             state.currentUser.email = email;
 
-            // El correo principal siempre tiene rango Administrador
             if (email === 'carlosnec@gmail.com') {
                 state.currentUser.rol = 'Administrador';
                 state.currentUser.nivelAsignado = null;
             } else {
-                // Consultar rol en la tabla de maestros de Supabase
                 const { data } = await supabaseClient
                     .from('maestros')
                     .select('rol_nivel, nivel')
@@ -964,11 +961,16 @@
         function aplicarPermisosEnInterfaz() {
             const roleBadge = document.getElementById('user-role-badge');
             if (roleBadge) {
-                roleBadge.textContent = `Rol: ${state.currentUser.rol}`;
+                if (state.currentUser.rol === 'Administrador') {
+                    roleBadge.textContent = `Rol: Administrador (Todos los Niveles)`;
+                } else {
+                    roleBadge.textContent = `Rol: ${state.currentUser.rol} (${state.currentUser.nivelAsignado})`;
+                }
                 roleBadge.classList.remove('hidden');
             }
 
             const rol = state.currentUser.rol;
+            const userNivel = state.currentUser.nivelAsignado;
 
             // 1. Pestaña Maestro solo visible para Administrador
             const navTeachers = document.getElementById('nav-teachers');
@@ -984,7 +986,7 @@
                 else navReports.classList.remove('hidden');
             }
 
-            // 3. Botones de gestión de módulos/evaluaciones (Líder de nivel o Admin)
+            // 3. Botones de gestión de módulos/evaluaciones (Líder o Admin)
             const roleLeaderElems = document.querySelectorAll('.role-leader-only');
             roleLeaderElems.forEach(el => {
                 if (rol === 'Administrador' || rol === 'Líder de nivel') {
@@ -994,15 +996,28 @@
                 }
             });
 
-            // 4. Si tiene un nivel asignado, seleccionar por defecto en los filtros
-            if (state.currentUser.nivelAsignado && rol !== 'Administrador') {
-                const selTracker = document.getElementById('tracker-level-select');
-                const selGrades = document.getElementById('grades-level-select');
-                const selReport = document.getElementById('report-level-select');
+            // 4. Bloqueo estricto de Nivel para no Administradores
+            const selTracker = document.getElementById('tracker-level-select');
+            const selGrades = document.getElementById('grades-level-select');
+            const selReport = document.getElementById('report-level-select');
 
-                if (selTracker) selTracker.value = state.currentUser.nivelAsignado;
-                if (selGrades) selGrades.value = state.currentUser.nivelAsignado;
-                if (selReport) selReport.value = state.currentUser.nivelAsignado;
+            if (rol !== 'Administrador' && userNivel) {
+                if (selTracker) {
+                    selTracker.value = userNivel;
+                    selTracker.disabled = true;
+                }
+                if (selGrades) {
+                    selGrades.value = userNivel;
+                    selGrades.disabled = true;
+                }
+                if (selReport) {
+                    selReport.value = userNivel;
+                    selReport.disabled = true;
+                }
+            } else {
+                if (selTracker) selTracker.disabled = false;
+                if (selGrades) selGrades.disabled = false;
+                if (selReport) selReport.disabled = false;
             }
         }
 
@@ -1931,18 +1946,26 @@
         }
 
         function renderDashboard() {
-            document.getElementById('stat-total-students').textContent = state.students.length;
+            const rol = state.currentUser.rol;
+            const userNivel = state.currentUser.nivelAsignado;
+
+            let alumnosFiltrados = state.students;
+            if (rol !== 'Administrador' && userNivel) {
+                alumnosFiltrados = state.students.filter(s => s.nivel === userNivel);
+            }
+
+            document.getElementById('stat-total-students').textContent = alumnosFiltrados.length;
             document.getElementById('stat-avg-attendance').textContent = state.countAsistencias;
             
-            const nivel0Count = state.students.filter(s => s.nivel && s.nivel.includes('Nivel 0')).length;
+            const nivel0Count = alumnosFiltrados.filter(s => s.nivel && s.nivel.includes('Nivel 0')).length;
             document.getElementById('stat-nivel0').textContent = nivel0Count;
 
-            const docsCount = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url).length;
+            const docsCount = alumnosFiltrados.filter(s => s.dui_url || s.partida_url || s.certificado_url).length;
             document.getElementById('stat-total-docs').textContent = docsCount;
 
             const tbody = document.getElementById('dashboard-students-list');
             tbody.innerHTML = '';
-            const recent = state.students.slice(0, 5);
+            const recent = alumnosFiltrados.slice(0, 5);
             if (recent.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">No hay alumnos registrados.</td></tr>`;
                 return;
@@ -1973,7 +1996,16 @@
             const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = '';
 
-            const filtered = state.students.filter(s => 
+            const rol = state.currentUser.rol;
+            const userNivel = state.currentUser.nivelAsignado;
+
+            // Filtro por Rol y Nivel
+            let alumnosPermitidos = state.students;
+            if (rol !== 'Administrador' && userNivel) {
+                alumnosPermitidos = state.students.filter(s => s.nivel === userNivel);
+            }
+
+            const filtered = alumnosPermitidos.filter(s => 
                 `${s.nombres} ${s.apellidos}`.toLowerCase().includes(search) || 
                 (s.documento && s.documento.toLowerCase().includes(search)) ||
                 (s.direccion && s.direccion.toLowerCase().includes(search)) ||
@@ -1985,7 +2017,7 @@
                 return;
             }
 
-            const canDelete = state.currentUser.rol === 'Administrador' || state.currentUser.rol === 'Líder de nivel';
+            const canDelete = rol === 'Administrador' || rol === 'Líder de nivel';
 
             filtered.forEach(s => {
                 const avatar = s.foto_url 
@@ -2036,6 +2068,15 @@
             document.getElementById('preview-foto').classList.add('hidden');
             document.getElementById('icon-foto-default').classList.remove('hidden');
             poblarSelectMaestros();
+
+            const selectLevel = document.getElementById('student-level');
+            if (state.currentUser.rol !== 'Administrador' && state.currentUser.nivelAsignado) {
+                selectLevel.value = state.currentUser.nivelAsignado;
+                selectLevel.disabled = true;
+            } else {
+                selectLevel.disabled = false;
+            }
+
             document.getElementById('student-modal-title').textContent = 'Registrar Nuevo Alumno';
             document.getElementById('student-modal').classList.remove('hidden');
         }
@@ -2051,7 +2092,14 @@
             document.getElementById('student-phone').value = student.telefono || '';
             document.getElementById('student-direccion').value = student.direccion || '';
             document.getElementById('student-age').value = student.edad || '';
-            document.getElementById('student-level').value = student.nivel || 'Inicial (Nivel 0)';
+
+            const selectLevel = document.getElementById('student-level');
+            selectLevel.value = student.nivel || 'Inicial (Nivel 0)';
+            if (state.currentUser.rol !== 'Administrador' && state.currentUser.nivelAsignado) {
+                selectLevel.disabled = true;
+            } else {
+                selectLevel.disabled = false;
+            }
             
             poblarSelectMaestros();
             document.getElementById('student-maestro').value = student.maestro_responsable || '';
@@ -2087,6 +2135,8 @@
                 const partidaUrlNueva = await subirArchivoSupabase(document.getElementById('file-partida'), 'partidas');
                 const certificadoUrlNuevo = await subirArchivoSupabase(document.getElementById('file-certificado'), 'certificados');
 
+                const selectLevel = document.getElementById('student-level');
+
                 const payload = {
                     nombres: document.getElementById('student-nombres').value,
                     apellidos: document.getElementById('student-apellidos').value,
@@ -2094,7 +2144,7 @@
                     telefono: document.getElementById('student-phone').value,
                     direccion: document.getElementById('student-direccion').value,
                     edad: document.getElementById('student-age').value ? parseInt(document.getElementById('student-age').value, 10) : null,
-                    nivel: document.getElementById('student-level').value,
+                    nivel: selectLevel.value,
                     maestro_responsable: document.getElementById('student-maestro').value,
                     foto_url: fotoUrlNueva || (studentExistente ? studentExistente.foto_url : null),
                     dui_url: duiUrlNuevo || (studentExistente ? studentExistente.dui_url : null),
@@ -2355,10 +2405,18 @@
             const grid = document.getElementById('documents-grid');
             grid.innerHTML = '';
 
-            const conDocumentos = state.students.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
+            const rol = state.currentUser.rol;
+            const userNivel = state.currentUser.nivelAsignado;
+
+            let alumnosPermitidos = state.students;
+            if (rol !== 'Administrador' && userNivel) {
+                alumnosPermitidos = state.students.filter(s => s.nivel === userNivel);
+            }
+
+            const conDocumentos = alumnosPermitidos.filter(s => s.dui_url || s.partida_url || s.certificado_url || s.foto_url);
 
             if (conDocumentos.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 text-sm">No se han adjuntado documentos aún. Agrega archivos desde el formulario de registro.</div>`;
+                grid.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 text-sm">No se han adjuntado documentos aún en este nivel.</div>`;
                 return;
             }
 
