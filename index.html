@@ -2317,7 +2317,10 @@
                 }
 
                 if (!idInput) {
-                    const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    const tempAuthClient = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY, {
+                        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+                    });
+                    const { data: authData, error: authError } = await tempAuthClient.auth.signUp({
                         email: email,
                         password: password
                     });
