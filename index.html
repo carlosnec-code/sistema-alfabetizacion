@@ -108,11 +108,6 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="db-status-text">Supabase Conectado</span>
-                    </div>
-
                     <div id="user-role-badge" class="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-xl border border-purple-200 hidden sm:block">
                         Rol: Administrador
                     </div>
@@ -223,17 +218,12 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-brand-600 to-emerald-700 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
-                        <div>
-                            <div class="bg-white/15 w-10 h-10 rounded-xl flex items-center justify-center mb-4 text-white">
-                                <i class="fa-solid fa-cloud"></i>
-                            </div>
-                            <h3 class="text-lg font-bold mb-2">Base de Datos Supabase</h3>
-                            <p class="text-xs text-brand-100 leading-relaxed mb-4">
-                                Los datos y expedientes adjuntos se almacenan de forma segura en la nube de Supabase.
-                            </p>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                        <div class="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-2 rounded-xl text-xs font-semibold w-fit">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span id="db-status-text">Supabase Conectado</span>
                         </div>
-                        <button onclick="switchTab('students'); openAddStudentModal();" class="bg-white text-brand-700 font-semibold py-2.5 px-4 rounded-xl text-xs hover:bg-brand-50 transition-all shadow-sm flex items-center justify-center space-x-2">
+                        <button onclick="switchTab('students'); openAddStudentModal();" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-user-plus"></i>
                             <span>Registrar Nuevo Alumno</span>
                         </button>
